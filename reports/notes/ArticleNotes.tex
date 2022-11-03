@@ -1,0 +1,135 @@
+\documentclass[twocolumn,aps,pra,superscriptaddress,nofootinbib,longbibliography]{revtex4-2}
+\usepackage{graphicx}% Include figure files
+\usepackage{dcolumn}% Align table columns on decimal point
+\usepackage{bm}% bold math
+\usepackage[latin5]{inputenc}% For Turkish characters
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsbsy}
+%\usepackage{mathptmx}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{physics}
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{mathtools}
+\usepackage{oubraces}
+\usepackage{dsfont}
+\usepackage[title, titletoc]{appendix}
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage[most]{tcolorbox}
+\usepackage{enumerate}
+\usepackage{subfloat}
+%\usepackage{hyperref}% add hypertext capabilities
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}%
+\usepackage{cleveref}
+\usepackage[normalem]{ulem}
+\Crefname{subfigures}{figure}{figures}
+\Crefname{subfigures}{Figure}{Figures}
+
+
+\newcommand{\tcr}[1]{{\color{red} #1}}
+\newcommand{\tcb}[1]{{\color{blue} #1}}
+\newcommand{\tcg}[1]{{\color{gray} #1}}
+\newcommand{\vari}[1]{\text{Var}(#1)}
+
+
+\def\bra#1{\mathinner{\langle{#1}|}}
+\def\ket#1{\mathinner{|{#1}\rangle}}
+%\def\braket#1{\langle{#1}|\rangle}
+\def\Bra#1{\left<#1\right|}
+\def\Ket#1{\left|#1\right>}
+%\newcommand{\dd}{\differential}
+
+%\newcommand{\nc}{\newcommand}
+%\nc{\rnc}{\renewcommand}
+%\nc{\beg}{\begin{equation}}
+%\nc{\eeq}{{\end{equation}}}
+%\nc{\beqa}{\begin{eqnarray}}
+%\nc{\eeqa}{\end{eqnarray}}
+%\nc{\lbar}[1]{\overline{#1}}
+%\nc{\bra}[1]{\langle#1|}
+%\nc{\ket}[1]{|#1\rangle}
+%\nc{\ketbra}[2]{|#1\rangle\!\langle#2|}
+%\nc{\braket}[2]{\langle#1|#2\rangle}
+%\newcommand{\braandket}[3]{\langle #1|#2|#3\rangle}
+
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{proposition}[theorem]{Proposition}
+\newenvironment{proof1}{\noindent\textbf{Proof:}}{\hfill \( \blacksquare \) \newline}
+
+
+
+%***=============================================================***%
+%***=============================================================***%
+
+
+\begin{document}
+
+\title{Deep Learning}
+
+\author{H\"useyin Talha \c{S}enya\c{s}a}
+\email{senyasa@itu.edu.tr}
+\affiliation{Department of Physics, Faculty of Science and Letters, Istanbul Technical University, 34469 Maslak, Istanbul, Turkey}
+
+
+
+
+%\date{\today}
+
+%***=============================================================***%
+%***=============================================================***%
+
+\begin{abstract}
+My personal notes on \textit{An application of deep reinforcement learning to algorithmic trading}.
+
+\end{abstract}
+
+\maketitle
+
+%***=============================================================***%
+%***=============================================================***%
+
+\section{Reinforcement learning}
+
+Some definitions and symbols
+
+\begin{enumerate}
+    \item \(S\): Set of environment and agent state.
+    \item \(A\): Set of actions which are available for agent to use.
+    \item \(s_t\): RL environment internal state
+    \item \(o_t\): Observation
+    \item \(a_t\): Trading action 
+    \item \(i_t\): Information
+    \item \(\pi(a_t|i_t)\): Trading policy (Rule)
+    \item \(r_t\): Network's reward.
+    \item \(\nu_{t}^c\): Total amount of cash in portfolio. 
+    \item \(\nu_{t}^s\): Corresponding value of the share.
+    \item \(n_t\): Total number of shares, lots. 
+\end{enumerate}
+
+Reinforcement learning techniques are concerned with the design of \(\pi\) maximizing an optimality criterion, which directly depends on the immediate rewards \(r_t\) observed over a certain time horizon.  
+
+
+\section{Additional notes and questions}
+
+\begin{enumerate}
+    \item Representing the transition from one candle to the next one as a Markov process.
+    \item Considering the correlation between candles as a spin system (as in the case of Witten's ``An introduction to quantum information theory'') 
+\end{enumerate}
+
+
+\clearpage
+
+
+\bibliography{biblio}
+
+\end{document}
