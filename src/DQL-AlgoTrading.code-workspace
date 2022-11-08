@@ -1,0 +1,26 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+	"settings": {
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/*.svg": true,
+			"**/*.h5": true,
+			"**/*.pyc": true,
+			"**/__pycache__": true,
+			"**/*.pkl": true,
+			"**/torch": true,
+			"**/argparse": true,
+            "**/.vscode": true,
+            "**/xmds2/xpdeint": true,
+            "**/xmds2_2d/xpdeint": true,
+            "**/other": true,
+		},
+}

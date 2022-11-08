@@ -1,0 +1,13 @@
+This file includes the description of how to name source files based on their context.
+
+All source files must have a prefix based on their context such xx_SourceFileName.ext where xx_ prefix highlights the context of the source file.
+
+Two pieces of codes that are implemented on different contexts must be separated.
+
+Only main files or non-executable files may not have a prefix
+
+List of Prefixes and Contexts:
+
+ai  -> Neural Network/Artificial Intelligence.
+at  -> Any piece of code that realizes trading activity.
+cm  -> Common files which may be used for in all contexts such as parsing operations.
