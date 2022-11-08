@@ -97,7 +97,8 @@ stocks = {
     'Toyota' : '7203.T',
     'Coca Cola' : 'KO',
     'AB InBev' : 'ABI.BR',
-    'Kirin' : '2503.T'
+    'Kirin' : '2503.T',
+    'IsBankasi': 'ISCTR.IS'
 }
 
 # Dictionary listing the 5 trading indices considered as testbench
@@ -135,7 +136,8 @@ companies = {
     'Toyota' : '7203.T',
     'Coca Cola' : 'KO',
     'AB InBev' : 'ABI.BR',
-    'Kirin' : '2503.T'
+    'Kirin' : '2503.T',
+    'IsBankasi': 'ISCTR.IS'
 }
 
 # Dictionary listing the classical trading strategies supported
