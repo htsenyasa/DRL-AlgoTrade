@@ -8,6 +8,6 @@ Only main files or non-executable files may not have a prefix
 
 List of Prefixes and Contexts:
 
-ai  -> Neural Network/Artificial Intelligence.
-at  -> Any piece of code that realizes trading activity.
-cm  -> Common files which may be used for in all contexts such as parsing operations.
+ai  -> (Artificial Intelligence)    -> Neural Network/Artificial Intelligence.
+tf  -> (Trading Framework)           -> Any piece of code that realizes trading activity.
+cm  -> (Common)                     -> Common files which may be used for in all contexts such as parsing operations.
