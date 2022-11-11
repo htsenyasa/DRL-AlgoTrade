@@ -9,17 +9,6 @@ class Position():
         self.currentPosition = currentPosition # Long or Short
         self.history = []
 
-    def SetPositionHorizon(self, startDate, endDate, interval="1d"):
-        """
-        horizonLength: horizonLength*interval
-        """
-        self.startDate = startDate
-        self.endDate = endDate
-        self.interval = interval
-
-    def GetPositionHorizon(self):
-        return (self.startDate, self.endDate, self.interval)
-
 
 class StockHandler():
     """ 
@@ -39,7 +28,7 @@ class StockHandler():
         self.endDate = horizon.end
         self.interval = horizon.interval
 
-        self.dataFrame = GetFunc(self.startDate, self.endDate, self.interval)
+        self.dataFrame = GetFunc(self.stockCode, start=self.startDate, end=self.endDate, interval=self.interval)
         self.dataFrame.replace(0.0, np.nan, inplace=True)
         self.dataFrame.interpolate(method='linear', limit=5, limit_area='inside', inplace=True)
         self.dataFrame.fillna(method='ffill', inplace=True)
