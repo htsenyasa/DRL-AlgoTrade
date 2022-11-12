@@ -118,6 +118,16 @@ Some definitions and symbols
 
 Reinforcement learning techniques are concerned with the design of \(\pi\) maximizing an optimality criterion, which directly depends on the immediate rewards \(r_t\) observed over a certain time horizon.  
 
+\subsection{Trading Environment}
+
+The trading environment of the DQL is implemented in \textit{OpenAI Gym} framework. The elements of the trading environment are as follows:
+
+\begin{align}
+    \mathcal{E}_{TE} = \{&\text{Close, Low, High, Volume, Position,} \\
+                         &\text{Action, Holdings, Cash, Money, Returns}\}
+\end{align}
+
+
 
 \section{Additional notes and questions}
 

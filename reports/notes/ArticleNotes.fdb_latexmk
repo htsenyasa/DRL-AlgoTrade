@@ -1,14 +1,14 @@
 # Fdb version 3
-["bibtex ArticleNotes"] 1667491258 "ArticleNotes.aux" "ArticleNotes.bbl" "ArticleNotes" 1667491258
+["bibtex ArticleNotes"] 1668169114 "ArticleNotes.aux" "ArticleNotes.bbl" "ArticleNotes" 1668169271
   "/usr/share/texmf-dist/bibtex/bib/msc/biblio.bib" 1650181202 1785 a8388404d3deab9d4205ecd2eb65bfde ""
   "/usr/share/texmf-dist/bibtex/bst/revtex/apsrev4-2.bst" 1650181511 69609 e9dea59f0e753ccda3ddc8f5806d846d ""
-  "ArticleNotes.aux" 1667491258 1456 8ee7c9b1e19b4e5dc74cf0062bb1bc5a "pdflatex"
-  "ArticleNotesNotes.bib" 1667491258 104 4d8bb863c86f3d7b03a471e9d4707f34 "pdflatex"
+  "ArticleNotes.aux" 1668169271 1576 7dc98da3404dcc9c376ba3095ea5b9e9 "pdflatex"
+  "ArticleNotesNotes.bib" 1668169271 104 4d8bb863c86f3d7b03a471e9d4707f34 "pdflatex"
   (generated)
   "ArticleNotes.bbl"
   "ArticleNotes.blg"
-["pdflatex"] 1667491258 "/home/user/Projects/DeepLearningLecture/reports/notes/ArticleNotes.tex" "ArticleNotes.pdf" "ArticleNotes" 1667491258
-  "/home/user/Projects/DeepLearningLecture/reports/notes/ArticleNotes.tex" 1667463189 4144 37ad72d1ca83daa243d61898e493c858 ""
+["pdflatex"] 1668169270 "/home/user/Projects/DeepLearningLecture/reports/notes/ArticleNotes.tex" "ArticleNotes.pdf" "ArticleNotes" 1668169271
+  "/home/user/Projects/DeepLearningLecture/reports/notes/ArticleNotes.tex" 1668169270 4493 bf1d7e6bffe24f3d4452b4e93316275f ""
   "/usr/share/texmf-dist/fonts/map/fontname/texfonts.map" 1650183167 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy5.tfm" 1650183167 1120 1e8878807317373affa7f7bba4cf2f6a ""
   "/usr/share/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy6.tfm" 1650183167 1124 14ccf5552bc7f77ca02a8a402bea8bfb ""
@@ -48,6 +48,7 @@
   "/usr/share/texmf-dist/fonts/tfm/public/cm/cmsy6.tfm" 1650183167 1116 933a60c408fc0a863a92debe84b2d294 ""
   "/usr/share/texmf-dist/fonts/tfm/public/cm/cmsy8.tfm" 1650183167 1120 8b7d695260f3cff42e636090a8002094 ""
   "/usr/share/texmf-dist/fonts/tfm/public/cm/cmsy9.tfm" 1650183167 1116 25a7bf822c58caf309a702ef79f4afbb ""
+  "/usr/share/texmf-dist/fonts/tfm/public/cm/cmti10.tfm" 1650183167 1480 aa8e34af0eb6a2941b776984cf1dfdc4 ""
   "/usr/share/texmf-dist/fonts/tfm/public/cm/cmti9.tfm" 1650183167 1476 cccc6cc4935c18ec3d5623b77ecb8b74 ""
   "/usr/share/texmf-dist/fonts/tfm/public/latex-fonts/lasy6.tfm" 1650183167 520 4889cce2180234b97cad636b6039c722 ""
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb" 1650183167 32080 340ef9bf63678554ee606688e7b5339d ""
@@ -62,6 +63,7 @@
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb" 1650183167 32569 5e5ddc8df908dea60932f3c484a54c0d ""
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb" 1650183167 32587 1788b0c1c5b39540c96f5e42ccd6dae8 ""
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb" 1650183167 32716 08e384dc442464e7285e891af9f45947 ""
+  "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb" 1650183167 37944 359e864bd06cde3b1cf57bb20757fb06 ""
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb" 1650183167 36310 f5ddc6715cc60deb16d9db5ded6a9391 ""
   "/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii" 1650183167 71627 94eb9990bed73c364d7f53f960cc8c5b ""
   "/usr/share/texmf-dist/tex/generic/atbegshi/atbegshi.sty" 1650183167 24708 5584a51a7101caf7e6bbf1fc27d8f7b1 ""
@@ -239,10 +241,10 @@
   "/usr/share/texmf-dist/web2c/texmf.cnf" 1650183167 39911 2da6c67557ec033436fe5418a70a8a61 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1667463361 4274140 6ffef722bc1262edc9440643c3ef1781 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1667463356 2927661 fc7c2e71268ad2683c3d3ddc088e3024 ""
-  "ArticleNotes.aux" 1667491258 1456 8ee7c9b1e19b4e5dc74cf0062bb1bc5a "pdflatex"
-  "ArticleNotes.bbl" 1667491258 1982 35453d3875d823f0ec9445e740a573d9 "bibtex ArticleNotes"
-  "ArticleNotes.out" 1667491258 690 9c074339b250e5806291ee1d1cf0b352 "pdflatex"
-  "ArticleNotes.tex" 1667463189 4144 37ad72d1ca83daa243d61898e493c858 ""
+  "ArticleNotes.aux" 1668169271 1576 7dc98da3404dcc9c376ba3095ea5b9e9 "pdflatex"
+  "ArticleNotes.bbl" 1668169114 1982 35453d3875d823f0ec9445e740a573d9 "bibtex ArticleNotes"
+  "ArticleNotes.out" 1668169271 842 a0ea526353d83cf931e97d2fb48119fd "pdflatex"
+  "ArticleNotes.tex" 1668169270 4493 bf1d7e6bffe24f3d4452b4e93316275f ""
   (generated)
   "ArticleNotes.aux"
   "ArticleNotes.log"
