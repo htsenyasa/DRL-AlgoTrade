@@ -2,36 +2,6 @@ import numpy as np
 
 signal = {"Buy": True, "Sell": False}
 
-class PositionHandler():
-    """ Creates a position for a given stock """
-    def __init__(self, stockCode, initialCash = 100_000, initialLots = 0, initialCost = 0, currentPosition = 0):
-        self.stockCode = stockCode
-        self.cash = float(initialCash)
-        self.lots = float(initialLots)
-        self.cost = float(initialCost)
-        self.currentPosition = currentPosition # Long or Short or No Position
-
-        self.value = self.lots * self.cost
-        self.returns = 0
-        self.actionHistory = []
-
-        self.__long = 1
-        self.__noPosition = 0
-        self.__short = -1
-
-    def IsLong(self):
-        return self.currentPosition == self.__long
-    def IsShort(self):
-        return self.currentPosition == self.__short
-    def GetPosition(self):
-        return self.currentPosition 
-
-    def Buy(self, data, fee):
-        if self.IsLong():
-            ...
-
-
-
 class StockHandler():
     """ 
     Handles stock
@@ -58,3 +28,33 @@ class StockHandler():
             self.dataFrame.fillna(method='ffill', inplace=True)
             self.dataFrame.fillna(method='bfill', inplace=True)
             self.dataFrame.fillna(0, inplace=True)
+
+
+class PositionHandler():
+    """ Creates a position for a given stock """
+    def __init__(self, stock, initialCash = 100_000, initialLots = 0, initialCost = 0, currentPosition = 0, tradingFee = 0.02):
+        self.stock = stock
+        self.cash = float(initialCash)
+        self.lots = float(initialLots)
+        self.cost = float(initialCost)
+        self.currentPosition = currentPosition # Long or Short or No Position
+
+        self.value = self.lots * self.cost
+        self.returns = 0
+
+        self.long = 1
+        self.noPosition = 0
+        self.short = -1       
+
+        self.tradingFee = tradingFee
+
+    def IsLong(self):
+        return self.currentPosition == self.long
+    def IsShort(self):
+        return self.currentPosition == self.short
+    def GetPosition(self):
+        return self.currentPosition 
+
+    def GoLong(self):
+        if self.IsLong():
+            ...
