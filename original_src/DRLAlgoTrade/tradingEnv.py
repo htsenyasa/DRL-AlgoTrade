@@ -185,7 +185,7 @@ class TradingEnv(gym.Env):
 
         # Reset additional variables related to the trading activity
         self.t = self.stateLength
-        self.numberOfShares = 0
+        self.numberOfShares = 0 
 
         return self.state
 
@@ -228,7 +228,6 @@ class TradingEnv(gym.Env):
         t = self.t
         numberOfShares = self.numberOfShares
         customReward = False
-
         # CASE 1: LONG POSITION
         if(action == 1):
             self.data['Position'][t] = 1
