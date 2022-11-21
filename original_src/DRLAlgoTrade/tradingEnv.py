@@ -293,6 +293,7 @@ class TradingEnv(gym.Env):
         else:
             self.reward = (self.data['Close'][t-1] - self.data['Close'][t])/self.data['Close'][t-1]
 
+
         # Transition to the next trading time step
         self.t = self.t + 1
         self.state = [self.data['Close'][self.t - self.stateLength : self.t].tolist(),

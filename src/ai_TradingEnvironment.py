@@ -40,3 +40,18 @@ class TradingEnvironment(gym.Env):
             self.Position.GoLong(self.tick)
         elif action == self.actions["SHORT"]:
             self.Position.GoShort(self.tick)
+            
+        if (self.Position.IsShort(self.tick)  and  self.Position.IsShort(self.tick-1)):
+            self.reward = (self.dataFrame["Close"][self.tick-1] - self.dataFrame["Close"][self.tick])/self.dataFrame["Close"][self.tick-1]
+        else:
+            self.reward = self.dataFrame["Returns"][self.tick]
+
+        self.tick += 1
+        self.state = [self.dataFrame['Close'][(self.tick - self.stateLength) : self.tick].tolist(),
+                      self.dataFrame['Low'][(self.tick - self.stateLength) : self.tick].tolist(),
+                      self.dataFrame['High'][(self.tick - self.stateLength) : self.tick].tolist(),
+                      self.dataFrame['Volume'][(self.tick - self.stateLength) : self.tick].tolist(),
+                      self.dataFrame["Position"][self.tick-1]]
+        
+        if(self.tick == self.dataFrame.shape[0]):
+            self.done = 1  

@@ -18,10 +18,12 @@ aapl = to.StockHandler("AAPL", yf.download, yf.download, isctrHorizon)
 pos = to.DummyPosition(aapl)
 pos.dataFrame["Close"] = pos.dataFrame["Adj Close"]
 
-teISCTR = te.TradingEnvironment(pos)
+myte = te.TradingEnvironment(pos)
+myte.step(1)
+myte.step(1)
+myte.step(0)
+myte.step(0)
+myte.step(0)
+myte.step(1)
 
-pos.GoLong(30)
-pos.GoLong(31)
-pos.GoShort(32)
-pos.GoShort(33)
-print(pos.dataFrame[29:34])
+print(pos.dataFrame[29:41])
