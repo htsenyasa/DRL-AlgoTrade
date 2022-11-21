@@ -140,6 +140,9 @@ class DummyPosition():
         self.dataFrame["Value"][tick] = self.dataFrame["Holdings"][tick] + self.dataFrame["Cash"][tick]
         self.dataFrame['Returns'][tick] = (self.dataFrame['Value'][tick] - self.dataFrame['Value'][prev])/self.dataFrame['Value'][prev]
 
+
+
+
     def GoShort(self, tick):
         prev = tick - 1
         self.dataFrame["Position"][tick] = self.SHORT
@@ -165,7 +168,7 @@ class DummyPosition():
         else:
             self.dataFrame["Lots"][tick] = int(self.dataFrame["Cash"][tick] // (self.dataFrame["Close"][tick] * (1 + self.tradingFee)))
             self.dataFrame["Cash"][tick] = self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick]
-            self.dataFrame["Holdings"][tick] = -self.dataFrame["Lots"] * self.dataFrame["Close"][tick]
+            self.dataFrame["Holdings"][tick] = -self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick]
             self.dataFrame["Action"][tick] = self.SHORT
 
 
