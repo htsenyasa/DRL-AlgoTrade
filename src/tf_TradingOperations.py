@@ -59,7 +59,7 @@ class PositionHandler():
 
 class DummyPosition():
     """ Creates an empty dummy position for a given stock for simulation purposes"""
-    def __init__(self, stock, tick = 30, initialCash = 100_000, tradingFee = 0.02, epsilon=0.1):
+    def __init__(self, stock, tick = 30, initialCash = 100_000, tradingFee = 0, epsilon=0.1):
         self.stock = stock
 
         self.LONG = 1
@@ -97,9 +97,6 @@ class DummyPosition():
             return self.dataFrame["Position"][tick]
         return self.dataFrame["Position"][self.tick]
 
-    def ClosePosition(self):
-        ...
-
     def ResetPosition(self):
         self.dataFrame = self.stock.dataFrame.copy()        
         self.dataFrame["Cash"] = self.initialCash
@@ -125,6 +122,7 @@ class DummyPosition():
         self.dataFrame["Position"][tick] = self.LONG
         if self.IsLong(prev):
             self.dataFrame["Cash"][tick] = self.dataFrame["Cash"][prev]
+            self.dataFrame["Lots"][tick] = self.dataFrame["Lots"][prev]
             self.dataFrame["Holdings"][tick] = self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick]
         elif self.IsShort(prev):
             #Close short position, to do that obtain necessary amount of shares first to return borrowed shares.
@@ -134,9 +132,8 @@ class DummyPosition():
             self.dataFrame["Holdings"][tick] = self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick]
             self.dataFrame["Action"][tick] = self.LONG
         else: #NO_POSITION
-            self.dataFrame["Cash"][tick] = self.dataFrame["Cash"][prev]
-            self.dataFrame["Lots"][tick] = int(self.dataFrame["Cash"][tick] // (self.dataFrame["Close"][tick] * (1 + self.tradingFee)))
-            self.dataFrame["Cash"][tick] = self.dataFrame["Cash"][tick] - self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick] * (1 + self.tradingFee)
+            self.dataFrame["Lots"][tick] = int(self.dataFrame["Cash"][prev] // (self.dataFrame["Close"][tick] * (1 + self.tradingFee)))
+            self.dataFrame["Cash"][tick] = self.dataFrame["Cash"][prev] - self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick] * (1 + self.tradingFee)
             self.dataFrame["Holdings"][tick] = self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick]
             self.dataFrame["Action"][tick] = self.LONG
 
@@ -149,7 +146,7 @@ class DummyPosition():
         if self.IsLong(prev):
             self.dataFrame["Cash"][tick] = self.dataFrame["Cash"][prev] + self.dataFrame["Lots"][prev] * self.dataFrame["Close"][tick] * (1 - self.tradingFee)
             self.dataFrame["Lots"][tick] = int(self.dataFrame["Cash"][tick] // (self.dataFrame["Close"][tick] * (1 + self.tradingFee)))
-            self.dataFrame["Cash"][tick] = self.dataFrame["Cash"][tick] + self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick] * (1 + self.tradingFee)
+            self.dataFrame["Cash"][tick] = self.dataFrame["Cash"][tick] + self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick] * (1 - self.tradingFee)
             self.dataFrame["Holdings"][tick] = -self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick]
             self.dataFrame["Action"][tick] = self.SHORT
         elif self.IsShort(prev):
@@ -163,6 +160,11 @@ class DummyPosition():
                 self.dataFrame["Lots"][tick] = self.dataFrame["Lots"][prev] - numberOfSharesToBuy
                 self.dataFrame["Cash"][tick] = self.dataFrame["Cash"][prev] - numberOfSharesToBuy * self.dataFrame["Close"][tick] * (1 + self.tradingFee)
                 self.dataFrame["Holdings"][tick] = -self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick]
+        else:
+            self.dataFrame["Lots"][tick] = int(self.dataFrame["Cash"][tick] // (self.dataFrame["Close"][tick] * (1 + self.tradingFee)))
+            self.dataFrame["Cash"][tick] = self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick]
+            self.dataFrame["Holdings"][tick] = -self.dataFrame["Lots"] * self.dataFrame["Close"][tick]
+            self.dataFrame["Action"][tick] = self.SHORT
 
 
         self.dataFrame["Value"][tick] = self.dataFrame["Holdings"][tick] + self.dataFrame["Cash"][tick]

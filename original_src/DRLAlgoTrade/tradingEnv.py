@@ -241,6 +241,7 @@ class TradingEnv(gym.Env):
                 self.data['Cash'][t] = self.data['Cash'][t - 1] - self.numberOfShares * self.data['Close'][t] * (1 + self.transactionCosts)
                 self.data['Holdings'][t] = self.numberOfShares * self.data['Close'][t]
                 self.data['Action'][t] = 1
+                
             # Case c: Short -> Long
             else:
                 self.data['Cash'][t] = self.data['Cash'][t - 1] - self.numberOfShares * self.data['Close'][t] * (1 + self.transactionCosts)

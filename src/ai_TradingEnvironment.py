@@ -1,4 +1,5 @@
 import gym
+from collections import namedtuple
 
 class TradingEnvironment(gym.Env):
     
@@ -7,6 +8,7 @@ class TradingEnvironment(gym.Env):
         self.stateLength = stateLength
         self.tick = stateLength
         self.horizon = Position.stock.horizon
+        self.actions = {"LONG": 1, "SHORT": 0}
 
         self.dataFrame = self.Position.dataFrame
         self.state = [self.dataFrame['Close'][0:self.stateLength].tolist(),
@@ -32,5 +34,9 @@ class TradingEnvironment(gym.Env):
 
         return self.state
 
-    def step(self):
-        ...
+    def step(self, action):
+
+        if action == self.actions["LONG"]:
+            self.Position.GoLong(self.tick)
+        elif action == self.actions["SHORT"]:
+            self.Position.GoShort(self.tick)

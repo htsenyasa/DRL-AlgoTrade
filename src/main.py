@@ -14,11 +14,14 @@ isctrHorizon = Horizon("2020-01-01", "2022-01-01", "1d")
 
 aapl = to.StockHandler("AAPL", yf.download, yf.download, isctrHorizon)
 
+
 pos = to.DummyPosition(aapl)
+pos.dataFrame["Close"] = pos.dataFrame["Adj Close"]
 
 teISCTR = te.TradingEnvironment(pos)
 
 pos.GoLong(30)
 pos.GoLong(31)
 pos.GoShort(32)
-print(pos.dataFrame[30:40])
+pos.GoShort(33)
+print(pos.dataFrame[29:34])

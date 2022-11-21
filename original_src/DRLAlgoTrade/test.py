@@ -9,4 +9,5 @@ myte = te.TradingEnv("AAPL", startingDate=startingDate, endingDate=endingDate, m
 myte.step(1)
 myte.step(1)
 myte.step(0)
-print(myte.data[30:40])
+myte.step(0)
+print(myte.data[29:34])
