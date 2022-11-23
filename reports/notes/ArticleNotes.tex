@@ -74,7 +74,7 @@
 
 \begin{document}
 
-\title{Deep Learning}
+\title{Deep Learning Project Progress Report}
 
 \author{H\"useyin Talha \c{S}enya\c{s}a}
 \email{senyasa@itu.edu.tr}
@@ -98,7 +98,10 @@ My personal notes on \textit{An application of deep reinforcement learning to al
 %***=============================================================***%
 %***=============================================================***%
 
-\section{Reinforcement learning}
+
+
+
+\section{Implementation of the Framework}
 
 Some definitions and symbols
 
@@ -120,14 +123,26 @@ Reinforcement learning techniques are concerned with the design of \(\pi\) maxim
 
 \subsection{Trading Environment}
 
+\subsubsection{Implementation of Fundamental Operations}
+
+Buy, Sell, GoShort, GoLong
+
+\subsubsection{Implementation of Trading Environment via OpenAI Gym}
+
 The trading environment of the DQL is implemented in \textit{OpenAI Gym} framework. The elements of the trading environment are as follows:
 
-\begin{align}
-    \mathcal{E}_{TE} = \{&\text{Close, Low, High, Volume, Position,} \\
-                         &\text{Action, Holdings, Cash, Money, Returns}\}
-\end{align}
+\begin{equation}
+    \begin{aligned}
+        \mathcal{E}_{TE} = \{&\text{Close, Low, High, Volume, Position,} \\
+        &\text{Action, Holdings, Cash, Money, Returns}\}
+    \end{aligned}
+\end{equation}
 
+\subsection{Implementation of Deep Neural Network}
 
+Network Architecture, loss function etc.
+
+\subsection{Implementation of Double-Q Mechanism}
 
 \section{Additional notes and questions}
 
@@ -135,6 +150,8 @@ The trading environment of the DQL is implemented in \textit{OpenAI Gym} framewo
     \item Representing the transition from one candle to the next one as a Markov process.
     \item Considering the correlation between candles as a spin system (as in the case of Witten's ``An introduction to quantum information theory'') 
 \end{enumerate}
+
+
 
 
 \clearpage
