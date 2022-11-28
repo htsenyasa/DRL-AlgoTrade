@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 signal = {"Buy": True, "Sell": False}
 
@@ -26,6 +27,13 @@ class StockHandler():
             self.dataFrame.fillna(method='ffill', inplace=True)
             self.dataFrame.fillna(method='bfill', inplace=True)
             self.dataFrame.fillna(0, inplace=True)
+        
+    def Update(self):
+        cur_data = self.UpdateFunc(self.stockCode)
+        if cur_data is None:
+            return None
+        self.dataFrame = pd.concat([self.dataFrame, cur_data])
+        return self.dataFrame
 
 
 class PositionHandler():

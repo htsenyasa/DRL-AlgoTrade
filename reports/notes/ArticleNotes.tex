@@ -57,6 +57,8 @@
 %\nc{\braket}[2]{\langle#1|#2\rangle}
 %\newcommand{\braandket}[3]{\langle #1|#2|#3\rangle}
 
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -123,20 +125,68 @@ Reinforcement learning techniques are concerned with the design of \(\pi\) maxim
 
 \subsection{Trading Environment}
 
-\subsubsection{Implementation of Fundamental Operations}
+The nature of an environment in deep reinforcement learning applications is dictated by the problem in question. In our case, the medium of the environment consists of discrete time series indexed by time-step \(t\). The interval, between sequential data points (corresponding to \(t-1\) and \(t\)) is determined by the trading frequency and it is denoted by \(\Delta t\). Since we only consider daily trading, the interval \(\Delta t\) is equal to 1 day. 
 
-Buy, Sell, GoShort, GoLong
+The information that is available to the agent for observation consists of two parts. The first part is the classical OHLCV (\textit{Open, High, Low, Close, Volume}) data of the stock in question, and the second part is the trading position which is denoted by \(P\). 
+Formally the observation made by the agent at time-step \(t\) can be expressed as 
+\begin{equation}
+    \mathcal{O}(t) = \{p_t^O, p_t^H, p_t^L, p_t^C, V_t, P_t\},
+\end{equation}
+where 
+\begin{enumerate}[-]
+    \item \(p_t^O\) is the opening price of the stock over the period \([t - \Delta t, t]\),
+    \item \(p_t^H\) is the highest price over the period \([t - \Delta t, t]\),
+    \item \(p_t^H\) is the lowest price over the period \([t - \Delta t, t]\),
+    \item \(p_t^C\) is the closing price over the period \([t - \Delta t, t]\),
+    \item \(V_t\) is the total volume of shares exchange over the period \([t - \Delta t, t]\).
+\end{enumerate}
+
+
+
+
+Initialization, iteration and reset. In the initialization part, one first builds the environment in a state which can be determined randomly. This initialized state corresponds to current status of the environment. In the iteration part, first, the RL agent provides an \textit{action} to take, then, the environment state is transitioned to the next state according to the action provided by the RL agent.
+
+
+
+
+
+% \begin{equation}
+%     \begin{aligned}
+%         \mathcal{E}_{TE} = \{&\text{Close, Low, High, Volume, Position,} \\
+%         &\text{Action, Holdings, Cash, Money, Returns}\}
+%     \end{aligned}
+% \end{equation}
+
+ 
+
+
+\subsubsection{Description of Trading Operations / Action Space}
+The agent starts its trading activity with an initial \(C_0\) amount of money and it is chosen in such a way that it is much lower than the average exchange volume of the stock in question. In this way, it becomes safe to assume that the actions carried out by the agent does not influence the stock movements. 
+
+For a given time-step \(t\), the agent can take two actions: \textit{long} and \textit{short}. A long action results in purchasing shares of the stock while a short action results in selling shares of the stock in question. 
+
+Let \(C_t\) be the available cash at time-step \(t\) and let \(Q_t\) be the number of shares the agent is going to buy or sell. If the agent takes the long position at time-step \(t\), the agent will have 
+\begin{equation}
+    Q_t = \floor*{\dfrac{C_{t}}{p_t^C (1 + T)}},
+\end{equation} 
+
+
+\subsubsection{Implementation of Trading Operations}
+
+
+
+One first needs to implement the trading operations to be able to implement the trading environment. The trading operations correspond to the actions that is taken by the agent. In normal circumstances, there must be a match between bid and ask orders to realize a trade operation. In order to detect these matches, one must be able access the order book of the stock in question. However, since assume that the total number of buy and sell orders are much smaller than the volume of the stock, we are going to implement only buy and sell operations. 
+
+The trading operations are implemented in an object oriented manner. There are two main classes to control trading operations: \textit{StockHandler} and \textit{DummyPosition}. The StockHandler class obtains the stock data and applies minor transformations to eliminate possible missing data points. This class also responsible for the real-time tracking of the stock via \textit{Update} method. The DummyPosition is class is implemented to carry out possible actions i.e., \textit{long} or \textit{short} operations. and to keep track of the position changes. Here we provide the prototypes of the two classes. 
+
 
 \subsubsection{Implementation of Trading Environment via OpenAI Gym}
 
-The trading environment of the DQL is implemented in \textit{OpenAI Gym} framework. The elements of the trading environment are as follows:
+The environment which the deep learning agent interacts with is implemented by utilizing \textit{OpenAI Gym} framework. OpenAI Gym is an open source python library that provides standardized application programming interface (API) to establish interaction/communication between agents and environments for reinforcement learning problems. 
 
-\begin{equation}
-    \begin{aligned}
-        \mathcal{E}_{TE} = \{&\text{Close, Low, High, Volume, Position,} \\
-        &\text{Action, Holdings, Cash, Money, Returns}\}
-    \end{aligned}
-\end{equation}
+A third party application has to implement/override several functions/methods that are inherited from the \textit{gym} base class. These methods include initialization, iteration and reset of the environment in question. 
+
+
 
 \subsection{Implementation of Deep Neural Network}
 

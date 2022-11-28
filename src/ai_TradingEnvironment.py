@@ -52,6 +52,8 @@ class TradingEnvironment(gym.Env):
         self.dataFrame.iloc[self.tick-1] = tempDataFramePrevTick
         self.dataFrame.iloc[self.tick] = tempDataFrameTick
 
+        #Implement the reward part for the opposite action.
+
         if action == self.actions["LONG"]:
             self.Position.GoLong(self.tick)
         elif action == self.actions["SHORT"]:
@@ -72,7 +74,5 @@ class TradingEnvironment(gym.Env):
         if(self.tick == self.dataFrame.shape[0]):
             self.done = 1
 
-        
-    def UpdateState(self):
 
 
