@@ -1,7 +1,7 @@
 # Fdb version 3
-["pdflatex"] 1669204861 "/home/user/Projects/DeepLearningLecture/reports/notes/Figs/figs.tex" "figs.pdf" "figs" 1669204861
+["pdflatex"] 1669896080 "/home/user/Projects/DeepLearningLecture/reports/notes/Figs/figs.tex" "figs.pdf" "figs" 1669896081
   "/dev/null" 0 -1 0 ""
-  "/home/user/Projects/DeepLearningLecture/reports/notes/Figs/figs.tex" 1669204860 2153 25b607fde38845782d126050c2ea6365 ""
+  "/home/user/Projects/DeepLearningLecture/reports/notes/Figs/figs.tex" 1669225705 2154 1cd4a19daefa7009d5d76457068ccf2a ""
   "/usr/share/texmf-dist/fonts/map/fontname/texfonts.map" 1650183167 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texmf-dist/fonts/tfm/public/cm/cmr12.tfm" 1650183167 1288 655e228510b4c2a1abe905c368440826 ""
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb" 1650183167 36299 5f9df58c2139e7edcf37c8fca4bd384d ""
@@ -147,8 +147,8 @@
   "/usr/share/texmf-dist/web2c/texmf.cnf" 1650183167 39911 2da6c67557ec033436fe5418a70a8a61 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1669204826 4276115 6c6d5e5a64f798aa2cbf4b9206039cc3 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1668542400 2927656 611ceec44804f4a9c8e79961536f91d3 ""
-  "figs.aux" 1669204861 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
-  "figs.tex" 1669204860 2153 25b607fde38845782d126050c2ea6365 ""
+  "figs.aux" 1669896081 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "figs.tex" 1669225705 2154 1cd4a19daefa7009d5d76457068ccf2a ""
   (generated)
   "figs.aux"
   "figs.log"
