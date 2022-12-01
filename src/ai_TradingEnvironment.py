@@ -3,7 +3,7 @@ from collections import namedtuple
 
 class TradingEnvironment(gym.Env):
     
-    def __init__(self, Position,  stateLength = 30):
+    def __init__(self2, Position,  stateLength = 30):
         self.Position = Position 
         self.stateLength = stateLength
         self.tick = int(stateLength)
