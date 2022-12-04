@@ -1,68 +1,3 @@
-\documentclass[conference]{IEEEtran}
-\IEEEoverridecommandlockouts
-% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
-\usepackage{cite}
-\usepackage{amsmath,amssymb,amsfonts}
-\usepackage[latin5]{inputenc}% For Turkish characters
-\usepackage{algorithmic}
-\usepackage{graphicx}
-\usepackage{textcomp}
-\usepackage{xcolor}
-\usepackage{graphicx}% Include figure files
-\usepackage{dcolumn}% Align table columns on decimal point
-\usepackage{bm}% bold math
-\usepackage[latin5]{inputenc}% For Turkish characters
-\usepackage{amssymb}
-\usepackage{amsmath}
-\usepackage{amsthm}
-\usepackage{amsbsy}
-%\usepackage{mathptmx}
-\usepackage{amsfonts}
-\usepackage{mathtools}
-\usepackage{physics}
-\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
-\usepackage{tabularx}
-\usepackage{xcolor}
-\usepackage{mathtools}
-\usepackage{oubraces}
-\usepackage{dsfont}
-\usepackage{graphicx}
-\usepackage{rotating}
-\usepackage[most]{tcolorbox}
-\usepackage{enumerate}
-\usepackage{subfloat}
-%\usepackage{hyperref}% add hypertext capabilities
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}%
-\usepackage{cleveref}
-\usepackage[normalem]{ulem}
-\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
-    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
-
-
-\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
-\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
-
-\begin{document}
-
-\title{Deep Learning Project Progress Report}
-
-\author{\IEEEauthorblockN{H\"useyin Talha \c{S}enya\c{s}a}
-\IEEEauthorblockA{\textit{Department of Physics, Faculty of Science and Letters,} \\
-\textit{Istanbul Technical University,}\\
-34469 Maslak, Istanbul, Turkey, \\
-senyasa@itu.edu.tr}
-}
-
-\maketitle
-
-\begin{abstract}
-
-\end{abstract}
-
-\begin{IEEEkeywords}
-algorithmic trading, deep Learning, deep reinforcement learning.
-\end{IEEEkeywords}
-
 \section{Introduction}
 
 \section{Implementation of the Framework}
@@ -164,4 +99,3 @@ A third party application has to implement/override several functions/methods th
 \end{figure}
 
 
-\end{document}

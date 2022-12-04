@@ -1,6 +1,6 @@
 # Fdb version 3
-["pdflatex"] 1670162550 "/Users/user/Documents/Work/Projects/DeepLearning/reports/WordFormat/ProgressReport.tex" "ProgressReport.pdf" "ProgressReport" 1670162551
-  "/Users/user/Documents/Work/Projects/DeepLearning/reports/WordFormat/ProgressReport.tex" 1670162158 13924 43d04cac3c8cf8e4d3428fc0c57fa599 ""
+["pdflatex"] 1670166556 "/Users/user/Documents/Work/Projects/DeepLearning/reports/WordFormat/ProgressReport.tex" "ProgressReport.pdf" "ProgressReport" 1670166557
+  "/Users/user/Documents/Work/Projects/DeepLearning/reports/WordFormat/ProgressReport.tex" 1670166556 13902 5ba47a97e0038289750b14c1853cb6c1 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2022/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/adobe/times/ptmb7t.tfm" 1136768653 2172 fd0c924230362ff848a33632ed45dc23 ""
@@ -34,15 +34,11 @@
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmbx6.tfm" 1136768653 1344 8a0be4fe4d376203000810ad4dc81558 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmbx7.tfm" 1136768653 1336 3125ccb448c1a09074e3aa4a9832f130 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmbx8.tfm" 1136768653 1332 1fde11373e221473104d6cc5993f046e ""
-  "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmex10.tfm" 1136768653 992 662f679a0b3d2d53c1b94050fdaa3f50 ""
-  "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmmi10.tfm" 1136768653 1528 abec98dbc43e172678c11b3b9031252a ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmmi6.tfm" 1136768653 1512 f21f83efb36853c0b70002322c1ab3ad ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmmi8.tfm" 1136768653 1520 eccf95517727cb11801f4f1aee3a21b4 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmmib10.tfm" 1136768653 1524 554068197b70979a55370e6c6495f441 ""
-  "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmr10.tfm" 1136768653 1296 45809c5a464d5f32c8f98ba97c1bb47f ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmr6.tfm" 1136768653 1300 b62933e007d01cfd073f79b963c01526 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmr8.tfm" 1136768653 1292 21c1c5bfeaebccffdb478fd231a0997d ""
-  "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmsy10.tfm" 1136768653 1124 6c73e740cf17375f03eec0ee63599741 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmsy6.tfm" 1136768653 1116 933a60c408fc0a863a92debe84b2d294 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/cm/cmsy8.tfm" 1136768653 1120 8b7d695260f3cff42e636090a8002094 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/public/doublestroke/dsrom10.tfm" 1136768653 452 168d896d9b2ead965bf08c9db69c947f ""
@@ -250,9 +246,9 @@
   "Figs/Figures/OHLCV.png" 1670162158 25291 90fed4ecfd3219f1bbfbd4f099310c02 ""
   "Figs/Figures/TradeEnvironment.png" 1670162158 25518 89633e4793b5d6008ee07459ccfd8e2d ""
   "IEEEtran.cls" 1670162158 288304 b67b6fc6c2abb39f9b461923f5199343 ""
-  "ProgressReport.aux" 1670162551 4046 364051aacefaad8b491dc5a2466858c3 "pdflatex"
-  "ProgressReport.out" 1670162551 1391 f052151717421d59281e8d18e05f2f88 "pdflatex"
-  "ProgressReport.tex" 1670162158 13924 43d04cac3c8cf8e4d3428fc0c57fa599 ""
+  "ProgressReport.aux" 1670166557 4046 364051aacefaad8b491dc5a2466858c3 "pdflatex"
+  "ProgressReport.out" 1670166557 1391 f052151717421d59281e8d18e05f2f88 "pdflatex"
+  "ProgressReport.tex" 1670166556 13902 5ba47a97e0038289750b14c1853cb6c1 ""
   (generated)
   "ProgressReport.aux"
   "ProgressReport.log"
