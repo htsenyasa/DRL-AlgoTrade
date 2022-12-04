@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.11.15)  1 DEC 2022 20:31
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.11.15)  4 DEC 2022 14:12
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -804,27 +804,36 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 98.
  (/usr/share/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<Figs/Figures/OHLCV.png, id=93, 578.16pt x 415.5525pt>
-File: Figs/Figures/OHLCV.png Graphic file (type png)
-<use Figs/Figures/OHLCV.png>
-Package pdftex.def Info: Figs/Figures/OHLCV.png  used on input line 117.
-(pdftex.def)             Requested size: 231.2599pt x 166.21805pt.
+<Figs/Figures/OHLCV-Single.png, id=93, 478.03593pt x 565.36218pt>
+File: Figs/Figures/OHLCV-Single.png Graphic file (type png)
+<use Figs/Figures/OHLCV-Single.png>
+Package pdftex.def Info: Figs/Figures/OHLCV-Single.png  used on input line 117.
+(pdftex.def)             Requested size: 191.21098pt x 226.14085pt.
 
 
 LaTeX Warning: The counter will not be printed.
-             The label is: - on input line 129.
+             The label is: - on input line 126.
 
-LaTeX Font Info:    Trying to load font information for U+dsrom on input line 139.
+<Figs/Figures/OHLCV.png, id=95, 578.16pt x 415.5525pt>
+File: Figs/Figures/OHLCV.png Graphic file (type png)
+<use Figs/Figures/OHLCV.png>
+Package pdftex.def Info: Figs/Figures/OHLCV.png  used on input line 137.
+(pdftex.def)             Requested size: 231.2599pt x 166.21805pt.
+LaTeX Font Info:    Trying to load font information for U+dsrom on input line 143.
 (/usr/share/texmf-dist/tex/latex/doublestroke/Udsrom.fd
 File: Udsrom.fd 1995/08/01 v0.1 Double stroke roman font definitions
-) [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./Figs/Figures/OHLCV.png>] [2] (./ArticleNotes.bbl
+) [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./Figs/Figures/OHLCV-Single.png (PNG copy)>]
 
-LaTeX Warning: Reference `LastBibItem' on page 3 undefined on input line 9.
+LaTeX Warning: A float is stuck (cannot be placed); try class option [floatfix] on input line 144.
+
+[2 <./Figs/Figures/OHLCV.png>] [3] (./ArticleNotes.bbl
+
+LaTeX Warning: Reference `LastBibItem' on page 4 undefined on input line 9.
 
 
 Package natbib Warning: Empty `thebibliography' environment on input line 53.
 
-) [3] (./ArticleNotes.aux)
+) [4] (./ArticleNotes.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -832,18 +841,18 @@ Package rerunfilecheck Info: File `ArticleNotes.out' has not changed.
 (rerunfilecheck)             Checksum: B77BF716F21FC04FC871DE6665477A23;2523.
  ) 
 Here is how much of TeX's memory you used:
- 32212 strings out of 478238
- 629276 string characters out of 5850455
- 982456 words of memory out of 5000000
- 49875 multiletter control sequences out of 15000+600000
+ 32227 strings out of 478238
+ 629591 string characters out of 5850455
+ 977456 words of memory out of 5000000
+ 49885 multiletter control sequences out of 15000+600000
  482820 words of font info for 80 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 90i,8n,99p,1366b,419s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb></usr/share/texmf-dist/fonts/type1/public/doublestroke/dsrom10.pfb>
-Output written on ArticleNotes.pdf (3 pages, 239462 bytes).
+ 90i,11n,99p,1383b,419s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb></usr/share/texmf-dist/fonts/type1/public/doublestroke/dsrom10.pfb>
+Output written on ArticleNotes.pdf (4 pages, 261702 bytes).
 PDF statistics:
- 223 PDF objects out of 1000 (max. 8388607)
- 154 compressed objects within 2 object streams
- 28 named destinations out of 1000 (max. 500000)
- 258 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 232 PDF objects out of 1000 (max. 8388607)
+ 161 compressed objects within 2 object streams
+ 32 named destinations out of 1000 (max. 500000)
+ 263 words of extra memory for PDF output out of 10000 (max. 10000000)
 
