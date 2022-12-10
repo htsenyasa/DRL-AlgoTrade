@@ -25,5 +25,5 @@ myte.step(0)
 myte.step(0)
 myte.step(0)
 myte.step(1)
-print(pos.dataFrame[29:40])
+# print(pos.dataFrame[29:40][["Holdings", "Returns"]])
 

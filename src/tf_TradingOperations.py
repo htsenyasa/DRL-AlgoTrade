@@ -19,7 +19,7 @@ class StockHandler():
         self.UpdateFunc = UpdateFunc
         self.horizon = horizon
 
-        self.dataFrame = GetFunc(self.stockCode, start=horizon.start, end=horizon.end, interval=horizon.interval)
+        self.dataFrame = GetFunc(self.stockCode, start=horizon.start, end=horizon.end, interval=horizon.interval, progress=False)
         
         if interpolate is True:
             self.dataFrame.replace(0.0, np.nan, inplace=True)

@@ -15,8 +15,13 @@ class TradingEnvironment(gym.Env):
         self.reward = 0.
         self.done = 0
 
-    def UpdateState(self, position = 0):
+    def UpdateState(self):
         currentStateRange = slice(self.tick - self.stateLength, self.tick)
+        if self.tick == self.stateLength: 
+            position = self.Position.NO_POSITION
+        else:
+            position = self.dataFrame["Position"][self.tick-1]
+
         return [self.dataFrame['Close'][currentStateRange].tolist(),
                 self.dataFrame['Low'][currentStateRange].tolist(),
                 self.dataFrame['High'][currentStateRange].tolist(),
@@ -38,7 +43,6 @@ class TradingEnvironment(gym.Env):
 
 
     def step(self, action):
-
         # Save tick and tick - 1 entries of the dataFrame to realize action branching -> Action, oppositeAction
         # This is a temporary workaround for oppositeAction.
         tempDataFramePrevTick = self.dataFrame.iloc[self.tick-1]
@@ -51,44 +55,34 @@ class TradingEnvironment(gym.Env):
         elif oppositeAction == self.actions["SHORT"]:
             self.Position.GoShort(self.tick)
 
-        if (self.Position.IsShort(self.tick-1)  and  self.dataFrame["Action"][self.tick] == self.Position.SHORT):
-            self.reward = (self.dataFrame["Close"][self.tick-1] - self.dataFrame["Close"][self.tick])/self.dataFrame["Close"][self.tick-1]
-        else:
-            self.reward = self.dataFrame["Returns"][self.tick]
+        self.oppositeActionState = self.UpdateState()
 
-        self.oppositeActionState = [self.dataFrame['Close'][(self.tick - self.stateLength) : self.tick].tolist(),
-                                    self.dataFrame['Low'][(self.tick - self.stateLength) : self.tick].tolist(),
-                                    self.dataFrame['High'][(self.tick - self.stateLength) : self.tick].tolist(),
-                                    self.dataFrame['Volume'][(self.tick - self.stateLength) : self.tick].tolist(),
-                                    self.dataFrame["Position"][self.tick-1]]
-
-        # self.oppositeActionInfo = ["State": ]
+        oppositeActionReward = self.GetReward()
+        self.oppositeActionInfo = {"State": self.oppositeActionState, "Reward": oppositeActionReward}
 
         # Replace by the old data back.
         self.dataFrame.iloc[self.tick-1] = tempDataFramePrevTick
         self.dataFrame.iloc[self.tick] = tempDataFrameTick
-
 
         if action == self.actions["LONG"]:
             self.Position.GoLong(self.tick)
         elif action == self.actions["SHORT"]:
             self.Position.GoShort(self.tick)
             
-        if (self.Position.IsShort(self.tick -1)  and  self.dataFrame["Action"][self.tick] == self.Position.SHORT):
-            self.reward = (self.dataFrame["Close"][self.tick-1] - self.dataFrame["Close"][self.tick])/self.dataFrame["Close"][self.tick-1]
-        else:
-            self.reward = self.dataFrame["Returns"][self.tick]
+        self.reward = self.GetReward()
 
         self.tick += 1
-        self.state = [self.dataFrame['Close'][(self.tick - self.stateLength) : self.tick].tolist(),
-                      self.dataFrame['Low'][(self.tick - self.stateLength) : self.tick].tolist(),
-                      self.dataFrame['High'][(self.tick - self.stateLength) : self.tick].tolist(),
-                      self.dataFrame['Volume'][(self.tick - self.stateLength) : self.tick].tolist(),
-                      self.dataFrame["Position"][self.tick-1]]
+        self.state = self.UpdateState()
         
         if(self.tick == self.dataFrame.shape[0]):
             self.done = 1
 
+        # print("REWARD: {:.3f}".format(self.reward))
 
-    def CalculateReward(self):
-        ...
+        return self.state, self.reward, self.done, self.oppositeActionInfo         
+
+
+    def GetReward(self):
+        if (self.Position.IsShort(self.tick -1)  and  self.dataFrame["Action"][self.tick] == self.Position.SHORT):
+            return (self.dataFrame["Close"][self.tick-1] - self.dataFrame["Close"][self.tick])/self.dataFrame["Close"][self.tick-1]
+        return self.dataFrame["Returns"][self.tick]
