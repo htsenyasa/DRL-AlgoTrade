@@ -13,4 +13,10 @@ myte.step(0)
 myte.step(0)
 myte.step(1)
 
-print(myte.data[29:40])
+
+import TDQN as tdqn
+
+mem = tdqn.ReplayMemory()
+
+
+# print(myte.data[29:40][["Holdings", "Returns"]])
