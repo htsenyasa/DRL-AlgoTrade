@@ -29,10 +29,10 @@ class StockHandler():
             self.dataFrame.fillna(0, inplace=True)
         
     def Update(self):
-        cur_data = self.UpdateFunc(self.stockCode)
-        if cur_data is None:
+        newData = self.UpdateFunc(self.stockCode)
+        if newData is None:
             return None
-        self.dataFrame = pd.concat([self.dataFrame, cur_data])
+        self.dataFrame = pd.concat([self.dataFrame, newData])
         return self.dataFrame
 
 
