@@ -49,7 +49,7 @@ class DummyPosition():
         self.epsilon = epsilon
         self.initialCash = float(initialCash)
         self.__tick = tick # To be able reset position to initial version.
-        self.tick = tick  # Current candle. Its unit (interval e.g., "1d", "1m" etc) is dictated by the stock.dataFrame
+        self.tick = tick  # Current candle. Its unit (interval e.g., "1d", "1m" etc) is dictated by the stock.dataFrame attribute
 
         self.dataFrame = stock.dataFrame.copy()        
         self.dataFrame["Cash"] = float(initialCash)

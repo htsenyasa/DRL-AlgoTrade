@@ -11,28 +11,31 @@ class TradingEnvironment(gym.Env):
         self.actions = {"LONG": 1, "SHORT": 0}
 
         self.dataFrame = self.Position.dataFrame
-        self.state = [self.dataFrame['Close'][0:self.stateLength].tolist(),
-                      self.dataFrame['Low'][0:self.stateLength].tolist(),
-                      self.dataFrame['High'][0:self.stateLength].tolist(),
-                      self.dataFrame['Volume'][0:self.stateLength].tolist(),
-                      [0]]
+        self.state = self.UpdateState()
         self.reward = 0.
         self.done = 0
+
+    def UpdateState(self, position = 0):
+        currentStateRange = slice(self.tick - self.stateLength, self.tick)
+        return [self.dataFrame['Close'][currentStateRange].tolist(),
+                self.dataFrame['Low'][currentStateRange].tolist(),
+                self.dataFrame['High'][currentStateRange].tolist(),
+                self.dataFrame['Volume'][currentStateRange].tolist(),
+                [position]]
+
 
     def reset(self):
         self.Position.ResetPosition()
-
-        self.dataFrame = self.Position.dataFrame
-        self.state = [self.dataFrame['Close'][0:self.stateLength].tolist(),
-                      self.dataFrame['Low'][0:self.stateLength].tolist(),
-                      self.dataFrame['High'][0:self.stateLength].tolist(),
-                      self.dataFrame['Volume'][0:self.stateLength].tolist(),
-                      [0]]
+        
         self.reward = 0.
         self.done = 0
         self.tick = self.stateLength
+        
+        self.dataFrame = self.Position.dataFrame
+        self.state = self.UpdateState()
 
         return self.state
+
 
     def step(self, action):
 
@@ -48,11 +51,23 @@ class TradingEnvironment(gym.Env):
         elif oppositeAction == self.actions["SHORT"]:
             self.Position.GoShort(self.tick)
 
+        if (self.Position.IsShort(self.tick-1)  and  self.dataFrame["Action"][self.tick] == self.Position.SHORT):
+            self.reward = (self.dataFrame["Close"][self.tick-1] - self.dataFrame["Close"][self.tick])/self.dataFrame["Close"][self.tick-1]
+        else:
+            self.reward = self.dataFrame["Returns"][self.tick]
+
+        self.oppositeActionState = [self.dataFrame['Close'][(self.tick - self.stateLength) : self.tick].tolist(),
+                                    self.dataFrame['Low'][(self.tick - self.stateLength) : self.tick].tolist(),
+                                    self.dataFrame['High'][(self.tick - self.stateLength) : self.tick].tolist(),
+                                    self.dataFrame['Volume'][(self.tick - self.stateLength) : self.tick].tolist(),
+                                    self.dataFrame["Position"][self.tick-1]]
+
+        # self.oppositeActionInfo = ["State": ]
+
         # Replace by the old data back.
         self.dataFrame.iloc[self.tick-1] = tempDataFramePrevTick
         self.dataFrame.iloc[self.tick] = tempDataFrameTick
 
-        #Implement the reward part for the opposite action.
 
         if action == self.actions["LONG"]:
             self.Position.GoLong(self.tick)
@@ -75,4 +90,5 @@ class TradingEnvironment(gym.Env):
             self.done = 1
 
 
-
+    def CalculateReward(self):
+        ...
