@@ -36,35 +36,6 @@ class StockHandler():
         return self.dataFrame
 
 
-class PositionHandler():
-    """ Creates a position for a given stock """
-    def __init__(self, stock, initialCash = 100_000, initialLots = 0, initialCost = 0, currentPosition = 0, tradingFee = 0.02):
-        self.stock = stock
-        self.cash = float(initialCash)
-        self.lots = float(initialLots)
-        self.cost = float(initialCost)
-        self.currentPosition = currentPosition # Long or Short or No Position
-
-        self.value = self.lots * self.cost
-        self.returns = 0
-
-        self.LONG = 1
-        self.NO_POSITION = 0
-        self.SHORT = -1       
-
-        self.tradingFee = tradingFee
-
-    def IsLong(self):
-        return self.currentPosition == self.LONG
-    def IsShort(self):
-        return self.currentPosition == self.SHORT
-    def GetPosition(self):
-        return self.currentPosition 
-
-    def GoLong(self):
-        if self.IsLong():
-            ...
-
 class DummyPosition():
     """ Creates an empty dummy position for a given stock for simulation purposes"""
     def __init__(self, stock, tick = 30, initialCash = 100_000, tradingFee = 0, epsilon=0.1):
@@ -182,3 +153,34 @@ class DummyPosition():
 
         self.dataFrame["Value"][tick] = self.dataFrame["Holdings"][tick] + self.dataFrame["Cash"][tick]
         self.dataFrame['Returns'][tick] = (self.dataFrame['Value'][tick] - self.dataFrame['Value'][prev])/self.dataFrame['Value'][prev]
+
+
+
+class PositionHandler():
+    """ Creates a position for a given stock """
+    def __init__(self, stock, initialCash = 100_000, initialLots = 0, initialCost = 0, currentPosition = 0, tradingFee = 0.02):
+        self.stock = stock
+        self.cash = float(initialCash)
+        self.lots = float(initialLots)
+        self.cost = float(initialCost)
+        self.currentPosition = currentPosition # Long or Short or No Position
+
+        self.value = self.lots * self.cost
+        self.returns = 0
+
+        self.LONG = 1
+        self.NO_POSITION = 0
+        self.SHORT = -1       
+
+        self.tradingFee = tradingFee
+
+    def IsLong(self):
+        return self.currentPosition == self.LONG
+    def IsShort(self):
+        return self.currentPosition == self.SHORT
+    def GetPosition(self):
+        return self.currentPosition 
+
+    def GoLong(self):
+        if self.IsLong():
+            ...
