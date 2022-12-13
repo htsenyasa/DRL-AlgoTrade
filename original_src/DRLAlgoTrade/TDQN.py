@@ -215,7 +215,7 @@ class DQN(nn.Module):
         super(DQN, self).__init__()
 
         # Definition of some Fully Connected layers
-        self.fc1 = nn.Linear(numberOfInputs , numberOfNeurons)
+        self.fc1 = nn.Linear(numberOfInputs, numberOfNeurons)
         self.fc2 = nn.Linear(numberOfNeurons, numberOfNeurons)
         self.fc3 = nn.Linear(numberOfNeurons, numberOfNeurons)
         self.fc4 = nn.Linear(numberOfNeurons, numberOfNeurons)

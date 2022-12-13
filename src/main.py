@@ -1,6 +1,7 @@
 import yfinance as yf
 import tf_TradingOperations as to
 import ai_TradingEnvironment as te
+import ai_TDQN as tdqn
 
 import pandas as pd
 pd.options.mode.chained_assignment = None 
@@ -25,5 +26,6 @@ myte.step(0)
 myte.step(0)
 myte.step(0)
 myte.step(1)
-# print(pos.dataFrame[29:40][["Holdings", "Returns"]])
 
+
+mem = tdqn.ReplayMemory(32)
