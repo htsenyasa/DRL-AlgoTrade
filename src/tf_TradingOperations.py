@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
+from collections import namedtuple
 
 signal = {"Buy": True, "Sell": False}
+Horizon = namedtuple("Horizon", ["start", "end", "interval"])
 
 class StockHandler():
     """ 
