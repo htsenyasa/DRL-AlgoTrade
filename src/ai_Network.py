@@ -5,8 +5,6 @@ import torch.autograd as autograd
 import torch.nn.functional as F
 from collections import namedtuple
 
-networkSettings = namedtuple("networkSettings", ["inputLayerSize", "hiddenLayerSize", "outputLayerSize", "dropout"])
-
 
 class FCFFN(nn.Module):
     def __init__(self, inputLayerSize, hiddenLayerSize, outputLayerSize, dropout):

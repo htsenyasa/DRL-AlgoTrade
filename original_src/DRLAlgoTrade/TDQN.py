@@ -590,6 +590,8 @@ class TDQN:
             nextState = torch.tensor(nextState, dtype=torch.float, device=self.device)
             done = torch.tensor(done, dtype=torch.float, device=self.device)
 
+            print(state)
+
             # Compute the current Q values returned by the policy network
             currentQValues = self.policyNetwork(state).gather(1, action.unsqueeze(1)).squeeze(1)
 
