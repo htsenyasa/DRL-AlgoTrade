@@ -19,8 +19,6 @@ optimSettings_ = namedtuple("optimSettings", ["L2Factor"])
 
 
 class ReplayMemory():
-    transition = namedtuple("transition", ["state", "action", "reward", "nextState", "done"])
-
     def __init__(self, capacity):
         self.memory = deque(maxlen=capacity)
 
@@ -71,13 +69,10 @@ class TDQNAgent():
 
         self.PolicyNetwork.train()
 
-        transitions = self.ReplayMemory.Sample(self.tdqnSettings.batchSize)
-        batch = ReplayMemory.transition(*zip(*transitions))
+        state, action, reward, nextState, done = self.ReplayMemory.Sample(self.tdqnSettings.batchSize)
+
         
-        state = torch.tensor(batch.state, dtype=torch.float, device=self.device)
-        action = torch.tensor(batch.action, dtype=torch.long, device=self.device)
-        reward = torch.tensor(batch.reward, dtype=torch.float, device=self.device)
-        nextState = torch.tensor(batch.nextState, dtype=torch.float, device=self.device)
-        done = torch.tensor(batch.done, dtype=torch.float, device=self.device)
+
+
 
         
