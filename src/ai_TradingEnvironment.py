@@ -1,5 +1,5 @@
 import gym
-from collections import namedtuple
+import numpy as np
 
 class TradingEnvironment(gym.Env):    
     def __init__(self, Position,  stateLength = 30):
@@ -20,6 +20,9 @@ class TradingEnvironment(gym.Env):
             position = self.Position.NO_POSITION
         else:
             position = self.dataFrame["Position"][self.tick-1]
+
+        if self.tick == self.dataFrame.shape[0]:
+            self.done = 1
 
         return [self.dataFrame['Close'][currentStateRange].tolist(),
                 self.dataFrame['Low'][currentStateRange].tolist(),
@@ -73,10 +76,10 @@ class TradingEnvironment(gym.Env):
         self.tick += 1
         self.state = self.UpdateState()
         
-        if(self.tick == self.dataFrame.shape[0]):
-            self.done = 1
+        # if(self.tick == self.dataFrame.shape[0]):
+        #     self.done = 1
 
-        # print("REWARD: {:.3f}".format(self.reward))
+        print("REWARD: {:.3f}".format(self.reward))
 
         return self.state, self.reward, self.done, self.oppositeActionInfo         
 
@@ -85,3 +88,8 @@ class TradingEnvironment(gym.Env):
         if (self.Position.IsShort(self.tick -1)  and  self.dataFrame["Action"][self.tick] == self.Position.SHORT):
             return (self.dataFrame["Close"][self.tick-1] - self.dataFrame["Close"][self.tick])/self.dataFrame["Close"][self.tick-1]
         return self.dataFrame["Returns"][self.tick]
+
+
+    def SetCustomStartingPoint(self, startingPoint):
+        self.tick = np.clip(startingPoint, self.stateLength, len(self.dataFrame.index))
+        self.state = self.UpdateState()
