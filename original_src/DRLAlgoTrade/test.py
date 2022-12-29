@@ -4,37 +4,40 @@ import TDQN as tdqn
 import torch
 import random
 
-device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
+startingDate = '2012-1-1'
+endingDate = '2020-1-1'
+splitingDate = '2018-1-1'
 
+stateLength = 30
+observationSpace = 1 + (stateLength-1)*4
+actionSpace = 2
 
-startingDate = '2020-01-01'
-endingDate = '2022-01-01'
+numberOfEpisodes = 50
+trainingParameters = [numberOfEpisodes]
 
-myte = te.TradingEnv("AAPL", startingDate=startingDate, endingDate=endingDate, money=100_000, startingPoint=1)
+# startingDate = '2020-01-01'
+# endingDate = '2022-01-01'
 
-print(myte.data.head())
-myte.setStartingPoint(50)
+myte = te.TradingEnv("AAPL", startingDate=startingDate, endingDate=endingDate, money=100_000)
 
+agent = tdqn.TDQN(observationSpace=observationSpace, actionSpace=actionSpace)
+# agent.training(myte, trainingParameters=trainingParameters, verbose=True, rendering=False, plotTraining=False, showPerformance=False)
+
+mem = tdqn.ReplayMemory()
 random.seed(10)
+for i in range(500):
+    action = random.randint(0,1)
+    state, reward, done, info = myte.step(action)
+    mem.push(state, action, reward, state, done)
 
-# for i in range(50):
-#     myte.step(1)
-print(myte.data[50-myte.stateLength:50])
-# print(len(myte.state))
-
-closePrices = [myte.state[0][i] for i in range(len(myte.state[0]))]
-lowPrices = [myte.state[1][i] for i in range(len(myte.state[1]))]
-highPrices = [myte.state[2][i] for i in range(len(myte.state[2]))]
-volumes = [myte.state[3][i] for i in range(len(myte.state[3]))]
-
-state = [item for sublist in myte.state for item in sublist]
-print(state)
-tensorState = torch.tensor(state, dtype=torch.float, device=device).unsqueeze(0)
-
-print(tensorState)
-
-print(closePrices)
+# print(myte.data[525:535][["Cash", "Action", "Holdings"]])
 
 
-# dataAugmentation = DataAugmentation()
-# trainingEnvList = dataAugmentation.generate(myte)
+coeffs = agent.getNormalizationCoefficients(myte)
+myte.setStartingPoint(60)
+state = agent.processState(myte.state, coeffs)
+
+for s in state:
+    print("{:.5f}".format(s))
+
+# print(coeffs)

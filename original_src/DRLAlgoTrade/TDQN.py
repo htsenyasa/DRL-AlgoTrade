@@ -367,6 +367,7 @@ class TDQN:
         self.policyNetwork.eval()
         self.targetNetwork.eval()
 
+
         # Set the Deep Learning optimizer
         self.optimizer = optim.Adam(self.policyNetwork.parameters(), lr=learningRate, weight_decay=L2Factor)
 
@@ -396,6 +397,7 @@ class TDQN:
         lowPrices = tradingData['Low'].tolist()
         highPrices = tradingData['High'].tolist()
         volumes = tradingData['Volume'].tolist()
+
 
         # Retrieve the coefficients required for the normalization
         coefficients = []
@@ -428,6 +430,7 @@ class TDQN:
         OUTPUTS: - state: Processed RL state.
         """
 
+
         # Normalization of the RL state
         closePrices = [state[0][i] for i in range(len(state[0]))]
         lowPrices = [state[1][i] for i in range(len(state[1]))]
@@ -440,12 +443,14 @@ class TDQN:
             state[0] = [((x - coefficients[0][0])/(coefficients[0][1] - coefficients[0][0])) for x in returns]
         else:
             state[0] = [0 for x in returns]
+            print("Zero State")
         # 2. Low/High prices => Delta prices => MinMax normalization
         deltaPrice = [abs(highPrices[i]-lowPrices[i]) for i in range(1, len(lowPrices))]
         if coefficients[1][0] != coefficients[1][1]:
             state[1] = [((x - coefficients[1][0])/(coefficients[1][1] - coefficients[1][0])) for x in deltaPrice]
         else:
             state[1] = [0 for x in deltaPrice]
+            print("Zero State")
         # 3. Close/Low/High prices => Close price position => No normalization required
         closePricePosition = []
         for i in range(1, len(closePrices)):
@@ -465,9 +470,11 @@ class TDQN:
             state[3] = [((x - coefficients[3][0])/(coefficients[3][1] - coefficients[3][0])) for x in volumes]
         else:
             state[3] = [0 for x in volumes]
-        
+
+       
         # Process the state structure to obtain the appropriate format
         state = [item for sublist in state for item in sublist]
+
 
         return state
 
@@ -519,10 +526,15 @@ class TDQN:
         # Choose the best action based on the RL policy
         with torch.no_grad():
             tensorState = torch.tensor(state, dtype=torch.float, device=self.device).unsqueeze(0)
+            print(self.policyNetwork(tensorState))
             QValues = self.policyNetwork(tensorState).squeeze(0)
+            print(QValues)
             Q, action = QValues.max(0)
+            print(Q, action)
             action = action.item()
             Q = Q.item()
+            print(Q, action)
+            input("Wait")
             QValues = QValues.cpu().numpy()
             return action, Q, QValues
 
@@ -582,6 +594,7 @@ class TDQN:
 
             # Sample a batch of experiences from the replay memory
             state, action, reward, nextState, done = self.replayMemory.sample(batchSize)
+
 
             # Initialization of Pytorch tensors for the RL experience elements
             state = torch.tensor(state, dtype=torch.float, device=self.device)

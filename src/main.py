@@ -22,23 +22,35 @@ optimSettings = tdqn.optimSettings_(L2Factor=0.000001)
 
 
 Horizon = namedtuple("Horizon", ["start", "end", "interval"])
-isctrHorizon = Horizon("2020-01-01", "2022-01-01", "1d")
+startingDate = '2012-1-1'
+endingDate = '2020-1-1'
+splittingDate = '2018-1-1'
+isctrHorizon = Horizon(startingDate, endingDate, "1d")
 aapl = to.StockHandler("AAPL", yf.download, yf.download, isctrHorizon)
 pos = to.DummyPosition(aapl)
 pos.dataFrame["Close"] = pos.dataFrame["Adj Close"]
 
-random.seed(10)
-
-
 myte = te.TradingEnvironment(pos)
-myte.SetCustomStartingPoint(50)
-
-for i in range(50):
-    action = random.randrange(0,1)
-    myte.step(action)
-print(myte.dataFrame[50-myte.stateLength:50])
-# print(myte.state)
-
-tensorState = torch.tensor(myte.state, dtype=torch.float, device=device).unsqueeze(0)
 
 
+
+mem = tdqn.ReplayMemory(100000)
+random.seed(10)
+for i in range(500):
+    action = random.randint(0,1)
+    state, reward, done, info = myte.step(action)
+    mem.Push(state, action, reward, state, done)
+
+# print(myte.dataFrame[525:535][["Cash", "Action", "Holdings"]])
+
+
+agent = tdqn.TDQNAgent(myte, tdqnSettings, networkSettings, optimSettings)
+# coeffs = agent.DataPreProcessing()
+myte.SetCustomStartingPoint(60)
+state = agent.StateProcessing(myte.state)
+# print(state, sep='\n')
+
+for s in state:
+    print("{:.5f}".format(s))
+
+# print(coeffs)

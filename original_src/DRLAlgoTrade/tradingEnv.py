@@ -356,7 +356,7 @@ class TradingEnv(gym.Env):
         self.info = {'State' : otherState, 'Reward' : otherReward, 'Done' : self.done}
 
         # Return the trading environment feedback to the RL trading agent
-        print("REWARD: {:.3f}".format(self.reward))
+        # print("REWARD: {:.3f}".format(self.reward))
         return self.state, self.reward, self.done, self.info
 
 

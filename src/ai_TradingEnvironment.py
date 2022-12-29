@@ -79,7 +79,7 @@ class TradingEnvironment(gym.Env):
         # if(self.tick == self.dataFrame.shape[0]):
         #     self.done = 1
 
-        print("REWARD: {:.3f}".format(self.reward))
+        # print("REWARD: {:.3f}".format(self.reward))
 
         return self.state, self.reward, self.done, self.oppositeActionInfo         
 

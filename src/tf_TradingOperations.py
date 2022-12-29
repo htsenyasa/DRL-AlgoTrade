@@ -148,7 +148,7 @@ class DummyPosition():
                 self.dataFrame["Action"][tick] = self.SHORT
         else:
             self.dataFrame["Lots"][tick] = int(self.dataFrame["Cash"][tick] // (self.dataFrame["Close"][tick] * (1 + self.tradingFee)))
-            self.dataFrame["Cash"][tick] = self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick]
+            self.dataFrame["Cash"][tick] = self.dataFrame["Cash"][prev] + self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick]
             self.dataFrame["Holdings"][tick] = -self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick]
             self.dataFrame["Action"][tick] = self.SHORT
 
