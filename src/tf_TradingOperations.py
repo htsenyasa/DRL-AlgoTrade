@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from collections import namedtuple
+import mplfinance as mpl
 
 signal = {"Buy": True, "Sell": False}
 Horizon = namedtuple("Horizon", ["start", "end", "interval"])
@@ -40,7 +41,7 @@ class StockHandler():
 
 class DummyPosition():
     """ Creates an empty dummy position for a given stock for simulation purposes"""
-    def __init__(self, stock, tick = 30, initialCash = 100_000, tradingFee = 0, epsilon=0.1):
+    def __init__(self, stock, tick = 30, initialCash = 100_000, tradingFee = 0.1/100, epsilon=0.1):
         self.stock = stock
 
         self.LONG = 1
@@ -54,6 +55,7 @@ class DummyPosition():
         self.tick = tick  # Current candle. Its unit (interval e.g., "1d", "1m" etc) is dictated by the stock.dataFrame attribute
 
         self.dataFrame = stock.dataFrame.copy()        
+        self.dataFrameLength = len(self.dataFrame.index)
         self.dataFrame["Cash"] = float(initialCash)
         self.dataFrame["Position"] = self.NO_POSITION
         self.dataFrame["Action"] = self.NO_ACTION
@@ -61,6 +63,10 @@ class DummyPosition():
         self.dataFrame["Holdings"] = 0
         self.dataFrame["Value"] = self.dataFrame["Holdings"] + self.dataFrame["Cash"]
         self.dataFrame["Returns"] = 0
+
+        # For plotting during testing
+        self.buyHistory = np.full(self.dataFrameLength, np.nan)
+        self.sellHistory = np.full(self.dataFrameLength, np.nan)
 
 
     def IsLong(self, tick = False):
@@ -123,7 +129,6 @@ class DummyPosition():
 
 
 
-
     def GoShort(self, tick):
         prev = tick - 1
         self.dataFrame["Position"][tick] = self.SHORT
@@ -155,6 +160,33 @@ class DummyPosition():
 
         self.dataFrame["Value"][tick] = self.dataFrame["Holdings"][tick] + self.dataFrame["Cash"][tick]
         self.dataFrame['Returns'][tick] = (self.dataFrame['Value'][tick] - self.dataFrame['Value'][prev])/self.dataFrame['Value'][prev]
+
+
+    def ParseActions(self):
+        actions = self.dataFrame["Position"].to_numpy(dtype=int)
+        index = []
+
+        buyHistory = np.full(self.dataFrameLength, np.nan)
+        sellHistory = np.full(self.dataFrameLength, np.nan)
+
+        for i in range(len(actions)-1):
+            if actions[i] == actions[i+1]:
+                index.append(i+1)
+
+        actions[index] = 0
+
+        for i, item in enumerate(actions):
+            if item == self.LONG:
+                buyHistory[i] = self.dataFrame["Close"][i]
+            elif item == self.SHORT:
+                sellHistory[i] = self.dataFrame["Close"][i]
+
+        return buyHistory, sellHistory
+
+    def PlotActions(self):
+        buyHistory, sellHistory = self.ParseActions()
+        
+
 
 
 

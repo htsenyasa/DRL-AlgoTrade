@@ -160,7 +160,7 @@ class TDQNAgent():
 
             if random.random() > self.GetEpsilon(iteration):
                 if random.random() > self.tdqnSettings.alpha:
-                    return self.ChooseAction(state, previousAction, greedyFlag=False)
+                    return self.ChooseAction(state, previousAction, trainingFlag=False)
                 else:
                     return previousAction, 0, [0, 0]
             else:
@@ -254,4 +254,22 @@ class TDQNAgent():
 
 
     def Testing(self):
-        ...
+        
+        env = self.TestingEnvironment
+        env.reset()
+        state = self.StateProcessing(env.state)
+        previousAction = None
+        done = 0
+
+        while done == 0:
+            action, _, _ = self.ChooseAction(state, previousAction, trainingFlag=False)
+            nextState, _, done, _ = env.step(action)
+            state = self.StateProcessing(nextState)
+
+    def SaveModel(self, filename):
+        torch.save(self.PolicyNetwork.state_dict(), filename)
+
+    def LoadModel(self, filename):
+        model = torch.load(filename, map_location=self.device)
+        self.PolicyNetwork.load_state_dict(model)
+        self.TargetNetwork.load_state_dict(model)

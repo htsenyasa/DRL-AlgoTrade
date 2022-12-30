@@ -1,5 +1,9 @@
 import gym
 import numpy as np
+from collections import namedtuple
+
+
+Horizon = namedtuple("Horizon", ["start", "end", "interval"])
 
 class TradingEnvironment(gym.Env):    
     def __init__(self, Position,  stateLength = 30):
@@ -44,7 +48,7 @@ class TradingEnvironment(gym.Env):
 
 
     def step(self, action):
-        # Save tick and tick - 1 entries of the dataFrame and done signal to realize action branching -> Action, oppositeAction
+        # Save tick and tick - 1 entries of the dataFrame and to realize action branching -> Action, oppositeAction
         # This is a temporary workaround for oppositeAction.
 
         # print(self.tick)
@@ -82,7 +86,6 @@ class TradingEnvironment(gym.Env):
         self.state = self.UpdateState()
 
         if self.tick == self.dataFrameLength:
-            # print("Done")
             self.done = 1
         
         return self.state, self.reward, self.done, self.oppositeActionInfo         

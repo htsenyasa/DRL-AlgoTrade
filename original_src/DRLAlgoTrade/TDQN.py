@@ -528,7 +528,6 @@ class TDQN:
         with torch.no_grad():
             tensorState = torch.tensor(state, dtype=torch.float, device=self.device).unsqueeze(0)
             QValues = self.policyNetwork(tensorState).squeeze(0)
-            print(QValues)
             Q, action = QValues.max(0)
             action = action.item()
             Q = Q.item()
@@ -842,6 +841,8 @@ class TDQN:
         if showPerformance:
             analyser = PerformanceEstimator(testingEnv.data)
             analyser.displayPerformance('TDQN')
+        
+        testingEnv.data.to_excel("output.xlsx")
         
         return testingEnv
 

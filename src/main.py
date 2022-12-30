@@ -5,9 +5,9 @@ import ai_TDQN as tdqn
 import ai_Network as network
 import pandas as pd
 pd.options.mode.chained_assignment = None
-from collections import namedtuple
 import torch
-import random
+import numpy as np
+import mplfinance as mpf
 
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
 
@@ -25,33 +25,42 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   gradientClipping=1,
                                   targetNetworkUpdate=1000, 
                                   alpha=0.1, 
-                                  numberOfEpisodes = 5, 
+                                  numberOfEpisodes = 50, 
                                   rewardClipping = 1
                                   )
 
 optimSettings = tdqn.optimSettings_(L2Factor=0.000001)
 
 
-Horizon = namedtuple("Horizon", ["start", "end", "interval"])
-startingDate = '2019-1-1'
+startingDate = '2012-1-1'
+splittingDate = '2018-1-1'
 endingDate = '2020-1-1'
-# splittingDate = '2018-1-1'
-isctrHorizon = Horizon(startingDate, endingDate, "1d")
-aapl = to.StockHandler("AAPL", yf.download, yf.download, isctrHorizon)
-pos = to.DummyPosition(aapl)
-pos.dataFrame["Close"] = pos.dataFrame["Adj Close"]
-
-myte = te.TradingEnvironment(pos)
 
 
+trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
+testingHorizon = te.Horizon(splittingDate, endingDate, "1d")
 
+aaplStockTraining = to.StockHandler("AAPL", yf.download, yf.download, trainingHorizon)
+aaplStockTesting = to.StockHandler("AAPL", yf.download, yf.download, testingHorizon)
 
-agent = tdqn.TDQNAgent(myte, myte, tdqnSettings, networkSettings, optimSettings)
+posTraining = to.DummyPosition(aaplStockTraining)
+posTesting = to.DummyPosition(aaplStockTesting)
+
+trainingEnvironment = te.TradingEnvironment(posTraining)
+testingEnvironment = te.TradingEnvironment(posTesting)
+
+agent = tdqn.TDQNAgent(trainingEnvironment, testingEnvironment, tdqnSettings, networkSettings, optimSettings)
 agent.Training()
+agent.Testing()
+buyHistory, sellHistory = posTesting.ParseActions()
 
-
+index = -100
+apd = [mpf.make_addplot(buyHistory[index:],type='scatter', markersize=50,marker='^'), mpf.make_addplot(sellHistory[index:],type='scatter', markersize=50,marker='v')]
+mpf.plot(posTesting.dataFrame[index:], addplot=apd, type="candle")
 
 # for s in state:
 #     print("{:.5f}".format(s))
 
 # print(coeffs)
+
+
