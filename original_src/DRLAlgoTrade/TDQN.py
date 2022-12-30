@@ -842,7 +842,6 @@ class TDQN:
             analyser = PerformanceEstimator(testingEnv.data)
             analyser.displayPerformance('TDQN')
         
-        testingEnv.data.to_excel("output.xlsx")
         
         return testingEnv
 

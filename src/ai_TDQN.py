@@ -8,6 +8,7 @@ import torch.nn.functional as F
 import ai_Network as network
 import math
 import numpy as np
+import tf_DataAugmentation as da
 
 tdqnSettings_ = namedtuple("tdqnSettings", ["gamma", "epsilonStart", "epsilonEnd", "epsilonDecay", 
                                             "capacity", "learningRate", "targetUpdateFrequency",
@@ -215,11 +216,15 @@ class TDQNAgent():
 
 
     def Training(self):
-       
+
+        env = self.TrainingEnvironment
+        DataAugmentation = da.DataAugmentation()
+        env = DataAugmentation.generate(env)[0]
+
+
         for episode in range(self.tdqnSettings.numberOfEpisodes):
 
             print("Training: Episode {}".format(episode))
-            env = self.TrainingEnvironment
 
             env.reset()
             env.SetCustomStartingPoint(random.randrange(env.dataFrameLength))
@@ -260,6 +265,9 @@ class TDQNAgent():
         state = self.StateProcessing(env.state)
         previousAction = None
         done = 0
+
+        DataAugmentation = da.DataAugmentation()
+        env = DataAugmentation.lowPassFilter(env, 5)
 
         while done == 0:
             action, _, _ = self.ChooseAction(state, previousAction, trainingFlag=False)

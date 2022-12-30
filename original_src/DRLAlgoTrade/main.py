@@ -30,15 +30,12 @@ if(__name__ == '__main__'):
     
     # Initialization of the required variables
     
-    start = time.time()
     simulator = TradingSimulator()
     strategy = args.strategy
     stock = args.stock
 
     # Training and testing of the trading strategy specified for the stock (market) specified
     simulator.simulateNewStrategy(strategy, stock, saveStrategy=False)
-    end = time.time()
-    print(end-start)
     """
     simulator.displayTestbench()
     simulator.analyseTimeSeries(stock)

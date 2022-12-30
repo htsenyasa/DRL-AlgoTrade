@@ -25,7 +25,7 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   gradientClipping=1,
                                   targetNetworkUpdate=1000, 
                                   alpha=0.1, 
-                                  numberOfEpisodes = 50, 
+                                  numberOfEpisodes = 5, 
                                   rewardClipping = 1
                                   )
 
@@ -57,10 +57,5 @@ buyHistory, sellHistory = posTesting.ParseActions()
 index = -100
 apd = [mpf.make_addplot(buyHistory[index:],type='scatter', markersize=50,marker='^'), mpf.make_addplot(sellHistory[index:],type='scatter', markersize=50,marker='v')]
 mpf.plot(posTesting.dataFrame[index:], addplot=apd, type="candle")
-
-# for s in state:
-#     print("{:.5f}".format(s))
-
-# print(coeffs)
 
 
