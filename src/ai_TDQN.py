@@ -9,11 +9,13 @@ import ai_Network as network
 import math
 import numpy as np
 
-tdqnSettings_ = namedtuple("tdqnSettings", ["gamma", "epsilonStart", "epsilonEnd", "epsilonDecay", "capacity",
-                                            "learningRate", "targetUpdateFrequency", "batchSize", "gradientClipping", "targetNetworkUpdate", "alpha"])
+tdqnSettings_ = namedtuple("tdqnSettings", ["gamma", "epsilonStart", "epsilonEnd", "epsilonDecay", 
+                                            "capacity", "learningRate", "targetUpdateFrequency",
+                                            "batchSize", "gradientClipping", "targetNetworkUpdate",
+                                            "alpha", "numberOfEpisodes", "rewardClipping"])
 
-networkSettings_ = namedtuple("networkSettings", ["inputLayerSize", "hiddenLayerSize",
-                                                  "outputLayerSize", "dropout"])
+networkSettings_ = namedtuple("networkSettings", ["inputLayerSize", "hiddenLayerSize", "outputLayerSize",
+                                                  "dropout"])
 
 optimSettings_ = namedtuple("optimSettings", ["L2Factor"])
 
@@ -43,10 +45,11 @@ class ReplayMemory():
 
 class TDQNAgent():
     
-    def __init__(self, TradingEnvironment, tdqnSettings, networkSettings, optimSettings):
+    def __init__(self, TrainingEnvironment, TestingEnvironment, tdqnSettings, networkSettings, optimSettings):
 
         #random seed
-        self.TradingEnvironment = TradingEnvironment
+        self.TrainingEnvironment = TrainingEnvironment
+        self.TestingEnvironment = TestingEnvironment
         self.tdqnSettings = tdqnSettings
         self.networkSettings = networkSettings
         self.optimSettings = optimSettings
@@ -73,11 +76,13 @@ class TDQNAgent():
         self.epsilonValue = st.epsilonEnd + (st.epsilonStart - st.epsilonEnd) * math.exp(-1 * iteration / st.epsilonDecay)
         return self.epsilonValue
 
+
+
     def DataPreProcessing(self):
-        close = self.TradingEnvironment.dataFrame.Close.values
-        low = self.TradingEnvironment.dataFrame.Low.values
-        high = self.TradingEnvironment.dataFrame.High.values
-        volume = self.TradingEnvironment.dataFrame.Volume.values
+        close = self.TrainingEnvironment.dataFrame.Close.values
+        low = self.TrainingEnvironment.dataFrame.Low.values
+        high = self.TrainingEnvironment.dataFrame.High.values
+        volume = self.TrainingEnvironment.dataFrame.Volume.values
 
         normalizationCoefficients = {"Returns": [], "DeltaPrice": [], "HighLow": [0,1], "Volume": []}
         margin = 1
@@ -114,7 +119,6 @@ class TDQNAgent():
             state[1] = [((x - coeffs["DeltaPrice"][0])/(coeffs["DeltaPrice"][1] - coeffs["DeltaPrice"][0])) for x in deltaPrice]
         else:
             state[1] = [0 for x in deltaPrice]
-            print("Zero State")
         # 3. Close/Low/High prices => Close price position => No normalization required
         closePricePosition = []
         for i in range(1, len(closePrices)):
@@ -141,10 +145,14 @@ class TDQNAgent():
 
         return state
 
+    def RewardProcessing(self, reward):
+        return np.clip(reward, -self.tdqnSettings.rewardClipping, self.tdqnSettings.rewardClipping)
 
-    def ChooseAction(self, state, previousAction, greedyFlag = True):
+
+
+    def ChooseAction(self, state, previousAction, trainingFlag = True):
         
-        if greedyFlag == True:
+        if trainingFlag == True:
             # sample = random.random()
             # alphaRandom = random.random()
             iteration = self.iteration
@@ -162,12 +170,12 @@ class TDQNAgent():
         with torch.no_grad():
             state = torch.tensor(state, dtype=torch.float, device=self.device).unsqueeze(0)
             output = self.PolicyNetwork(state).squeeze(0)
-            print(output)
             QMax, index = output.max(0)
             action = index.item()
             Q = QMax.item()
             QValues = output.cpu().numpy()
             return action, Q, QValues
+
 
 
     def LearnFromMemory(self):
@@ -190,7 +198,7 @@ class TDQNAgent():
         with torch.no_grad():
             nextActions = torch.max(self.PolicyNetwork(nextState), 1).indices
             nextQValues = self.TargetNetwork(nextState).gather(1, nextActions.unsqueeze(1)).squeeze(1)
-            expectedQValues = self.tdqnSettings.reward + self.tdqnSettings.gamma * nextQValues * (1 - done)
+            expectedQValues = reward + self.tdqnSettings.gamma * nextQValues * (1 - done)
 
         loss = F.smooth_l1_loss(currentQValues, expectedQValues)
         self.optimizer.zero_grad()
@@ -199,7 +207,7 @@ class TDQNAgent():
         torch.nn.utils.clip_grad_norm_(self.PolicyNetwork.parameters(), self.tdqnSettings.gradientClipping)
         self.optimizer.step()
         
-        if(self.iterations % self.tdqnSettings.targetNetworkUpdate == 0):
+        if(self.iteration % self.tdqnSettings.targetNetworkUpdate == 0):
             self.TargetNetwork.load_state_dict(self.PolicyNetwork.state_dict())
         
         self.PolicyNetwork.eval()
@@ -207,4 +215,43 @@ class TDQNAgent():
 
 
     def Training(self):
+       
+        for episode in range(self.tdqnSettings.numberOfEpisodes):
+
+            print("Training: Episode {}".format(episode))
+            env = self.TrainingEnvironment
+
+            env.reset()
+            env.SetCustomStartingPoint(random.randrange(env.dataFrameLength))
+            state = self.StateProcessing(env.state)
+            previousAction = 0
+            done = 0
+
+            while done == 0:
+                action = self.ChooseAction(state, previousAction)[0]
+
+                nextState, reward, done, oppositeActionInfo = env.step(action)
+
+                nextState = self.StateProcessing(nextState)
+                reward = self.RewardProcessing(reward)
+                self.ReplayMemory.Push(state, action, reward, nextState, done)
+
+              
+                oppositeAction = int(not bool(action))
+                oppositeActionReward = self.RewardProcessing(oppositeActionInfo["Reward"])
+                oppositeActionNextState = self.StateProcessing(oppositeActionInfo["State"])
+                oppositeActionDone = oppositeActionInfo["Done"]
+
+                self.ReplayMemory.Push(state, oppositeAction, oppositeActionReward, oppositeActionNextState, oppositeActionDone)
+
+                self.LearnFromMemory()
+
+                state = nextState
+                previousAction = action
+        
+        return self.TrainingEnvironment
+
+
+
+    def Testing(self):
         ...

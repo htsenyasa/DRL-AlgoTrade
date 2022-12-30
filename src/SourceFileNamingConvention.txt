@@ -9,5 +9,5 @@ Only main files or non-executable files may not have a prefix
 List of Prefixes and Contexts:
 
 ai  -> (Artificial Intelligence)    -> Neural Network/Artificial Intelligence.
-tf  -> (Trading Framework)           -> Any piece of code that realizes trading activity.
+tf  -> (Trading Framework)          -> Any piece of code that realizes trading or related activity.
 cm  -> (Common)                     -> Common files which may be used for in all contexts such as parsing operations.

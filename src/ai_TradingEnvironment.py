@@ -10,9 +10,11 @@ class TradingEnvironment(gym.Env):
         self.actions = {"LONG": 1, "SHORT": 0}
 
         self.dataFrame = self.Position.dataFrame
+        self.dataFrameLength = len(self.dataFrame.index)
         self.state = self.UpdateState()
         self.reward = 0.
         self.done = 0
+
 
     def UpdateState(self):
         currentStateRange = slice(self.tick - self.stateLength, self.tick)
@@ -20,9 +22,6 @@ class TradingEnvironment(gym.Env):
             position = self.Position.NO_POSITION
         else:
             position = self.dataFrame["Position"][self.tick-1]
-
-        if self.tick == self.dataFrame.shape[0]:
-            self.done = 1
 
         return [self.dataFrame['Close'][currentStateRange].tolist(),
                 self.dataFrame['Low'][currentStateRange].tolist(),
@@ -45,10 +44,14 @@ class TradingEnvironment(gym.Env):
 
 
     def step(self, action):
-        # Save tick and tick - 1 entries of the dataFrame to realize action branching -> Action, oppositeAction
+        # Save tick and tick - 1 entries of the dataFrame and done signal to realize action branching -> Action, oppositeAction
         # This is a temporary workaround for oppositeAction.
+
+        # print(self.tick)
+
         tempDataFramePrevTick = self.dataFrame.iloc[self.tick-1]
         tempDataFrameTick = self.dataFrame.iloc[self.tick]
+        tempDone = self.done
 
         # Take the opposite action first.
         oppositeAction = int(not bool(action))
@@ -56,15 +59,17 @@ class TradingEnvironment(gym.Env):
             self.Position.GoLong(self.tick)
         elif oppositeAction == self.actions["SHORT"]:
             self.Position.GoShort(self.tick)
+        
 
         self.oppositeActionState = self.UpdateState()
 
         oppositeActionReward = self.GetReward()
-        self.oppositeActionInfo = {"State": self.oppositeActionState, "Reward": oppositeActionReward}
+        self.oppositeActionInfo = {"State": self.oppositeActionState, "Reward": oppositeActionReward, "Done": self.done}
 
         # Replace by the old data back.
         self.dataFrame.iloc[self.tick-1] = tempDataFramePrevTick
         self.dataFrame.iloc[self.tick] = tempDataFrameTick
+        self.done = tempDone
 
         if action == self.actions["LONG"]:
             self.Position.GoLong(self.tick)
@@ -75,12 +80,11 @@ class TradingEnvironment(gym.Env):
 
         self.tick += 1
         self.state = self.UpdateState()
+
+        if self.tick == self.dataFrameLength:
+            # print("Done")
+            self.done = 1
         
-        # if(self.tick == self.dataFrame.shape[0]):
-        #     self.done = 1
-
-        # print("REWARD: {:.3f}".format(self.reward))
-
         return self.state, self.reward, self.done, self.oppositeActionInfo         
 
 
