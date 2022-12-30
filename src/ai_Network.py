@@ -11,6 +11,7 @@ class FCFFN(nn.Module):
         
         super(FCFFN, self).__init__()
         
+        torch.manual_seed(10)
         self.fc1 = nn.Linear(inputLayerSize , hiddenLayerSize) 
         self.fc2 = nn.Linear(hiddenLayerSize, hiddenLayerSize) 
         self.fc3 = nn.Linear(hiddenLayerSize, hiddenLayerSize) 

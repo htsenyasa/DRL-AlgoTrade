@@ -10,7 +10,7 @@ import math
 import numpy as np
 
 tdqnSettings_ = namedtuple("tdqnSettings", ["gamma", "epsilonStart", "epsilonEnd", "epsilonDecay", "capacity",
-                                            "learningRate", "targetUpdateFrequency", "batchSize", "gradientClipping", "targetNetworkUpdate"])
+                                            "learningRate", "targetUpdateFrequency", "batchSize", "gradientClipping", "targetNetworkUpdate", "alpha"])
 
 networkSettings_ = namedtuple("networkSettings", ["inputLayerSize", "hiddenLayerSize",
                                                   "outputLayerSize", "dropout"])
@@ -55,6 +55,7 @@ class TDQNAgent():
 
         self.ReplayMemory = ReplayMemory(self.tdqnSettings.capacity)
 
+        torch.cuda.manual_seed_all(10)
         self.PolicyNetwork = network.FCFFN(*self.networkSettings).to(self.device)
         self.TargetNetwork = network.FCFFN(*self.networkSettings).to(self.device)
         self.TargetNetwork.load_state_dict(self.PolicyNetwork.state_dict())
@@ -63,12 +64,13 @@ class TDQNAgent():
 
         self.optimizer = optim.Adam(self.PolicyNetwork.parameters(), lr=self.tdqnSettings.learningRate, weight_decay=self.optimSettings.L2Factor)
 
-        self.epsilonValue = self.GetEpsilon()
+        self.epsilonValue = self.GetEpsilon(self.iteration)
 
 
-    def GetEpsilon(self):
+
+    def GetEpsilon(self, iteration):
         st = self.tdqnSettings
-        self.epsilonValue = st.epsilonEnd + (st.epsilonStart - st.epsilonEnd) * math.exp(-1 * self.iteration / st.epsilonDecay)
+        self.epsilonValue = st.epsilonEnd + (st.epsilonStart - st.epsilonEnd) * math.exp(-1 * iteration / st.epsilonDecay)
         return self.epsilonValue
 
     def DataPreProcessing(self):
@@ -89,6 +91,8 @@ class TDQNAgent():
         normalizationCoefficients["Volume"] = [np.min(volume)/margin, np.max(volume)*margin]
 
         return normalizationCoefficients
+
+
 
     def StateProcessing(self, state):
         coeffs = self.DataPreProcessing()
@@ -138,6 +142,32 @@ class TDQNAgent():
         return state
 
 
+    def ChooseAction(self, state, previousAction, greedyFlag = True):
+        
+        if greedyFlag == True:
+            # sample = random.random()
+            # alphaRandom = random.random()
+            iteration = self.iteration
+            self.iteration += 1
+
+            if random.random() > self.GetEpsilon(iteration):
+                if random.random() > self.tdqnSettings.alpha:
+                    return self.ChooseAction(state, previousAction, greedyFlag=False)
+                else:
+                    return previousAction, 0, [0, 0]
+            else:
+                return random.randrange(self.networkSettings.outputLayerSize), 0, [0, 0]
+
+
+        with torch.no_grad():
+            state = torch.tensor(state, dtype=torch.float, device=self.device).unsqueeze(0)
+            output = self.PolicyNetwork(state).squeeze(0)
+            print(output)
+            QMax, index = output.max(0)
+            action = index.item()
+            Q = QMax.item()
+            QValues = output.cpu().numpy()
+            return action, Q, QValues
 
 
     def LearnFromMemory(self):
@@ -155,24 +185,26 @@ class TDQNAgent():
         nextState = torch.tensor(nextState, dtype=torch.float, device=self.device)
         done = torch.tensor(done, dtype=torch.float, device=self.device)
 
-        currentQValues = self.policyNetwork(state).gather(1, action.unsqueeze(1)).squeeze(1)
+        currentQValues = self.PolicyNetwork(state).gather(1, action.unsqueeze(1)).squeeze(1)
 
         with torch.no_grad():
-            nextActions = torch.max(self.policyNetwork(nextState), 1).indices
-            nextQValues = self.targetNetwork(nextState).gather(1, nextActions.unsqueeze(1)).squeeze(1)
+            nextActions = torch.max(self.PolicyNetwork(nextState), 1).indices
+            nextQValues = self.TargetNetwork(nextState).gather(1, nextActions.unsqueeze(1)).squeeze(1)
             expectedQValues = self.tdqnSettings.reward + self.tdqnSettings.gamma * nextQValues * (1 - done)
 
         loss = F.smooth_l1_loss(currentQValues, expectedQValues)
         self.optimizer.zero_grad()
         loss.backward()
 
-        torch.nn.utils.clip_grad_norm_(self.policyNetwork.parameters(), self.tdqnSettings.gradientClipping)
+        torch.nn.utils.clip_grad_norm_(self.PolicyNetwork.parameters(), self.tdqnSettings.gradientClipping)
         self.optimizer.step()
         
         if(self.iterations % self.tdqnSettings.targetNetworkUpdate == 0):
             self.TargetNetwork.load_state_dict(self.PolicyNetwork.state_dict())
         
         self.PolicyNetwork.eval()
+
+
 
     def Training(self):
         ...

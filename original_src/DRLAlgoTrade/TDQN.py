@@ -213,6 +213,7 @@ class DQN(nn.Module):
 
         # Call the constructor of the parent class (Pytorch torch.nn.Module)
         super(DQN, self).__init__()
+        torch.manual_seed(10)
 
         # Definition of some Fully Connected layers
         self.fc1 = nn.Linear(numberOfInputs, numberOfNeurons)
@@ -526,15 +527,11 @@ class TDQN:
         # Choose the best action based on the RL policy
         with torch.no_grad():
             tensorState = torch.tensor(state, dtype=torch.float, device=self.device).unsqueeze(0)
-            print(self.policyNetwork(tensorState))
             QValues = self.policyNetwork(tensorState).squeeze(0)
             print(QValues)
             Q, action = QValues.max(0)
-            print(Q, action)
             action = action.item()
             Q = Q.item()
-            print(Q, action)
-            input("Wait")
             QValues = QValues.cpu().numpy()
             return action, Q, QValues
 
@@ -553,7 +550,6 @@ class TDQN:
                  - QValues: Array of all the Qvalues outputted by the
                             Deep Neural Network.
         """
-
         # EXPLOITATION -> RL policy
         if(random.random() > self.epsilonValue(self.iterations)):
             # Sticky action (RL generalization mechanism)

@@ -24,7 +24,7 @@ agent = tdqn.TDQN(observationSpace=observationSpace, actionSpace=actionSpace)
 # agent.training(myte, trainingParameters=trainingParameters, verbose=True, rendering=False, plotTraining=False, showPerformance=False)
 
 mem = tdqn.ReplayMemory()
-random.seed(10)
+random.seed(12)
 for i in range(500):
     action = random.randint(0,1)
     state, reward, done, info = myte.step(action)
@@ -37,7 +37,11 @@ coeffs = agent.getNormalizationCoefficients(myte)
 myte.setStartingPoint(60)
 state = agent.processState(myte.state, coeffs)
 
-for s in state:
-    print("{:.5f}".format(s))
+action, _, _ = agent.chooseAction(state)
+
+print(action)
+
+# for s in state:
+#     print("{:.5f}".format(s))
 
 # print(coeffs)
