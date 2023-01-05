@@ -9,6 +9,8 @@ import ai_Network as network
 import math
 import numpy as np
 import tf_DataAugmentation as da
+import matplotlib.pyplot as plt
+import pickle
 
 tdqnSettings_ = namedtuple("tdqnSettings", ["gamma", "epsilonStart", "epsilonEnd", "epsilonDecay", 
                                             "capacity", "learningRate", "targetUpdateFrequency",
@@ -56,6 +58,7 @@ class TDQNAgent():
         self.optimSettings = optimSettings
         self.device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
         self.iteration = 0
+        self.loss = []
 
         self.ReplayMemory = ReplayMemory(self.tdqnSettings.capacity)
 
@@ -79,11 +82,18 @@ class TDQNAgent():
 
 
 
-    def DataPreProcessing(self):
-        close = self.TrainingEnvironment.dataFrame.Close.values
-        low = self.TrainingEnvironment.dataFrame.Low.values
-        high = self.TrainingEnvironment.dataFrame.High.values
-        volume = self.TrainingEnvironment.dataFrame.Volume.values
+    def DataPreProcessing(self, testingFlag = False):
+
+        if testingFlag == True:
+            DataAugmentation = da.DataAugmentation()
+            env = DataAugmentation.lowPassFilter(self.TrainingEnvironment, 5)
+        else:
+            env = self.TrainingEnvironment
+
+        close = env.dataFrame.Close.values
+        low = env.dataFrame.Low.values
+        high = env.dataFrame.High.values
+        volume = env.dataFrame.Volume.values
 
         normalizationCoefficients = {"Returns": [], "DeltaPrice": [], "HighLow": [0,1], "Volume": []}
         margin = 1
@@ -100,8 +110,12 @@ class TDQNAgent():
 
 
 
-    def StateProcessing(self, state):
-        coeffs = self.DataPreProcessing()
+    def StateProcessing(self, state, testingFlag = False):
+
+        if testingFlag == True:
+            coeffs = self.DataPreProcessing(testingFlag=True)
+        else:
+            coeffs = self.DataPreProcessing()
 
         closePrices = [state[0][i] for i in range(len(state[0]))]
         lowPrices = [state[1][i] for i in range(len(state[1]))]
@@ -201,9 +215,9 @@ class TDQNAgent():
             nextQValues = self.TargetNetwork(nextState).gather(1, nextActions.unsqueeze(1)).squeeze(1)
             expectedQValues = reward + self.tdqnSettings.gamma * nextQValues * (1 - done)
 
-        loss = F.smooth_l1_loss(currentQValues, expectedQValues)
+        self.currentLoss = F.smooth_l1_loss(currentQValues, expectedQValues)
         self.optimizer.zero_grad()
-        loss.backward()
+        self.currentLoss.backward()
 
         torch.nn.utils.clip_grad_norm_(self.PolicyNetwork.parameters(), self.tdqnSettings.gradientClipping)
         self.optimizer.step()
@@ -253,6 +267,8 @@ class TDQNAgent():
 
                 state = nextState
                 previousAction = action
+            
+            self.loss.append(self.currentLoss.cpu().detach().numpy())
         
         return self.TrainingEnvironment
 
@@ -260,24 +276,62 @@ class TDQNAgent():
 
     def Testing(self):
         
-        env = self.TestingEnvironment
-        env.reset()
+        DataAugmentation = da.DataAugmentation()
+        self.TestingEnvironment.reset()
+        env = DataAugmentation.lowPassFilter(self.TestingEnvironment, 5)
+
         state = self.StateProcessing(env.state)
         previousAction = None
         done = 0
 
-        DataAugmentation = da.DataAugmentation()
-        env = DataAugmentation.lowPassFilter(env, 5)
-
         while done == 0:
             action, _, _ = self.ChooseAction(state, previousAction, trainingFlag=False)
             nextState, _, done, _ = env.step(action)
+            self.TestingEnvironment.step(action)
             state = self.StateProcessing(nextState)
 
-    def SaveModel(self, filename):
-        torch.save(self.PolicyNetwork.state_dict(), filename)
+        return self.TestingEnvironment
 
-    def LoadModel(self, filename):
-        model = torch.load(filename, map_location=self.device)
+
+
+    def SaveModel(self, fileName):
+        lossFileName = "./Models/" + fileName + "-loss"
+        lossFile = open(lossFileName, "wb")
+        pickle.dump(self.loss, lossFile)
+        lossFile.close()
+
+        modelFileName = "./Models/" + fileName
+        torch.save(self.PolicyNetwork.state_dict(), modelFileName)
+
+
+
+    def LoadModel(self, fileName):
+        lossFileName = "./Models/" + fileName + "-loss"
+        lossFile = open(lossFileName, "rb")
+        self.loss = pickle.load(lossFile)
+        lossFile.close()
+
+        modelFileName = "./Models/" + fileName
+        model = torch.load(modelFileName, map_location=self.device)
         self.PolicyNetwork.load_state_dict(model)
         self.TargetNetwork.load_state_dict(model)
+
+
+
+    def PlotLoss(self, saveFileName, showFlag = False):
+        fig, ax1 = plt.subplots()
+        ax1.plot(range(len(self.loss)), self.loss, label="Loss")
+        ax1.set_xlabel("Loss", fontsize=20)
+        ax1.set_ylabel("# of Episodes", fontsize=20)
+        ax1.legend(loc="upper left", fontsize=14)
+        ax1.tick_params(labelsize=14)
+        # ax1.set_aspect()
+        figure = plt.gcf()
+        figure.set_size_inches(16,9)
+        plt.tight_layout()
+
+        plt.savefig("./Figures/" + saveFileName + ".png", format = "png", dpi=400)
+        if showFlag == True:
+            plt.show()
+
+

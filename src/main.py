@@ -8,8 +8,15 @@ pd.options.mode.chained_assignment = None
 import torch
 import numpy as np
 import mplfinance as mpf
+import tf_DataAugmentation as da
+import matplotlib.pyplot as plt
+import random
+
 
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
+torch.manual_seed(0)
+random.seed(0)
+np.random.seed(0)
 
 
 networkSettings = tdqn.networkSettings_(inputLayerSize=117, hiddenLayerSize=512, outputLayerSize=2, dropout=0.2)
@@ -25,7 +32,7 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   gradientClipping=1,
                                   targetNetworkUpdate=1000, 
                                   alpha=0.1, 
-                                  numberOfEpisodes = 5, 
+                                  numberOfEpisodes = 3, 
                                   rewardClipping = 1
                                   )
 
@@ -50,12 +57,20 @@ trainingEnvironment = te.TradingEnvironment(posTraining)
 testingEnvironment = te.TradingEnvironment(posTesting)
 
 agent = tdqn.TDQNAgent(trainingEnvironment, testingEnvironment, tdqnSettings, networkSettings, optimSettings)
-agent.Training()
+# agent.Training()
+# agent.SaveModel("MyModel4")
+agent.LoadModel("MyModel4")
 agent.Testing()
-buyHistory, sellHistory = posTesting.ParseActions()
+posTesting.PlotActions("AAPL4-100", showFlag=True)
+agent.PlotLoss("APPL4-100-Loss", showFlag=True)
 
-index = -100
-apd = [mpf.make_addplot(buyHistory[index:],type='scatter', markersize=50,marker='^'), mpf.make_addplot(sellHistory[index:],type='scatter', markersize=50,marker='v')]
-mpf.plot(posTesting.dataFrame[index:], addplot=apd, type="candle")
+# index = -200
+# apd = [mpf.make_addplot(buyHistory[index:],type='scatter', markersize=50,marker='^'), mpf.make_addplot(sellHistory[index:],type='scatter', markersize=50,marker='v')]
+# mpf.plot(posTesting.dataFrame[index:], addplot=apd, type="candle")
+
+# apd = [mpf.make_addplot(buyHistory,type='scatter', markersize=50,marker='^'), mpf.make_addplot(sellHistory,type='scatter', markersize=50,marker='v')]
+# mpf.plot(posTesting.dataFrame, addplot=apd, type="candle")
 
 
+# plt.plot(agent.TestingEnvironment.dataFrame.index, buyHistory[buyHistory != np.nan])
+# plt.show()
