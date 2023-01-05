@@ -1,3 +1,4 @@
+import multiprocessing as mp
 import yfinance as yf
 import tf_TradingOperations as to
 import ai_TradingEnvironment as te
@@ -11,8 +12,6 @@ import mplfinance as mpf
 import tf_DataAugmentation as da
 import matplotlib.pyplot as plt
 import random
-import time
-
 
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
 torch.manual_seed(0)
@@ -41,35 +40,35 @@ optimSettings = tdqn.optimSettings_(L2Factor=0.000001)
 
 
 startingDate = '2012-1-1'
-splittingDate = '2021-1-1'
-endingDate = '2023-1-1'
+splittingDate = '2018-1-1'
+endingDate = '2020-1-1'
 
 
 trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
 testingHorizon = te.Horizon(splittingDate, endingDate, "1d")
 
-aaplStockTraining = to.StockHandler("AAPL", yf.download, yf.download, trainingHorizon)
-aaplStockTesting = to.StockHandler("AAPL", yf.download, yf.download, testingHorizon)
+def InitializeProcess(stockName, identifierString, verbose = False):
+    fileName = stockName + identifierString
 
-posTraining = to.DummyPosition(aaplStockTraining)
-posTesting = to.DummyPosition(aaplStockTesting)
+    if verbose == True:
+        print("Stock Name: " + stockName)
+    
+    StockTraining = to.StockHandler(stockName, yf.download, yf.download, trainingHorizon)
+    StockTesting = to.StockHandler(stockName, yf.download, yf.download, testingHorizon)
+    PositionTraining = to.DummyPosition(StockTraining)
+    PositionTesting = to.DummyPosition(StockTesting)
+    TrainingEnvironment = te.TradingEnvironment(PositionTraining)
+    TestingEnvironment = te.TradingEnvironment(PositionTesting)
+    Agent = tdqn.TDQNAgent(TrainingEnvironment, TestingEnvironment, tdqnSettings, networkSettings, optimSettings)
+    Agent.Training()
+    Agent.SaveModel(fileName)
+    Agent.Testing()
+    PositionTesting.PlotActionsCapital(fileName + "-Capital", showFlag=True)
+    Agent.PlotLoss(fileName + "-Loss", showFlag=True)
 
-trainingEnvironment = te.TradingEnvironment(posTraining)
-testingEnvironment = te.TradingEnvironment(posTesting)
 
-fileName = "APPL-2123-v1"
 
-start = time.time()
+if __name__ == "__main__":
+    listOfStocks = ["AAPL", "ISCTR.IS"]
+    processList = [mp.Process(target=InitializeProcess, args = (listOfStocks[i], "1820", True)) for i in range(2)]
 
-agent = tdqn.TDQNAgent(trainingEnvironment, testingEnvironment, tdqnSettings, networkSettings, optimSettings)
-agent.Training()
-agent.SaveModel(fileName)
-# agent.LoadModel("MyModel3")
-agent.Testing()
-
-end = time.time()
-print("In Seconds: {}".format(end - start))
-print("In Minutes: {}".format((end - start))/60)
-
-posTesting.PlotActionsCapital(fileName + "-Capital", showFlag=True)
-agent.PlotLoss(fileName + "-Loss", showFlag=True)

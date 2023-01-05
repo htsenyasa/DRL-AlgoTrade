@@ -229,7 +229,7 @@ class TDQNAgent():
 
 
 
-    def Training(self):
+    def Training(self, verbose = False):
 
         env = self.TrainingEnvironment
         DataAugmentation = da.DataAugmentation()
@@ -238,7 +238,8 @@ class TDQNAgent():
 
         for episode in range(self.tdqnSettings.numberOfEpisodes):
 
-            print("Training: Episode {}".format(episode))
+            if verbose == True:
+                print("Training: Episode {}".format(episode))
 
             env.reset()
             env.SetCustomStartingPoint(random.randrange(env.dataFrameLength))
@@ -325,6 +326,7 @@ class TDQNAgent():
         ax1.set_ylabel("# of Episodes", fontsize=20)
         ax1.legend(loc="upper left", fontsize=14)
         ax1.tick_params(labelsize=14)
+        ax1.set_yscale("log")
         # ax1.set_aspect()
         figure = plt.gcf()
         figure.set_size_inches(16,9)
