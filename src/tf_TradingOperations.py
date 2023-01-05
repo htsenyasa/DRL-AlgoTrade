@@ -184,7 +184,7 @@ class DummyPosition():
 
         return buyHistory, sellHistory
 
-    def PlotActions(self, saveFileName, showFlag = False):
+    def PlotActionsCapital(self, saveFileName, showFlag = False):
         buyHistory, sellHistory = self.ParseActions()
         idx = np.argwhere(~np.isnan(buyHistory))
         idx = idx.flatten()
@@ -214,6 +214,20 @@ class DummyPosition():
         plt.savefig("./Figures/" + saveFileName + ".png", format = "png", dpi=400)
         if showFlag == True:
             plt.show()
+
+    def PlotActionsCandle(self, saveFileName, showFlag = False):
+        buyHistory, sellHistory = self.ParseActions()
+        idx = np.argwhere(~np.isnan(buyHistory))
+        idx = idx.flatten()
+        buys = self.dataFrame["Value"][idx]
+
+        idxSell = np.argwhere(~np.isnan(sellHistory))
+        idxSell = idxSell.flatten()
+        sells = self.dataFrame["Value"][idxSell]
+
+        apd = [mpf.make_addplot(buyHistory,type='scatter', markersize=50,marker='^'), mpf.make_addplot(sellHistory,type='scatter', markersize=50,marker='v')]
+        saveFileName = "./Figures/" + saveFileName + "-candle" + ".png"
+        mpf.plot(self.dataFrame, addplot=apd, type="candle", savefig=saveFileName) 
 
 
 

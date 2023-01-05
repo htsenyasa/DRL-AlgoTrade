@@ -61,16 +61,5 @@ agent = tdqn.TDQNAgent(trainingEnvironment, testingEnvironment, tdqnSettings, ne
 # agent.SaveModel("MyModel4")
 agent.LoadModel("MyModel4")
 agent.Testing()
-posTesting.PlotActions("AAPL4-100", showFlag=True)
+posTesting.PlotActionsCapital("AAPL4-100", showFlag=True)
 agent.PlotLoss("APPL4-100-Loss", showFlag=True)
-
-# index = -200
-# apd = [mpf.make_addplot(buyHistory[index:],type='scatter', markersize=50,marker='^'), mpf.make_addplot(sellHistory[index:],type='scatter', markersize=50,marker='v')]
-# mpf.plot(posTesting.dataFrame[index:], addplot=apd, type="candle")
-
-# apd = [mpf.make_addplot(buyHistory,type='scatter', markersize=50,marker='^'), mpf.make_addplot(sellHistory,type='scatter', markersize=50,marker='v')]
-# mpf.plot(posTesting.dataFrame, addplot=apd, type="candle")
-
-
-# plt.plot(agent.TestingEnvironment.dataFrame.index, buyHistory[buyHistory != np.nan])
-# plt.show()
