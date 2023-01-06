@@ -14,7 +14,7 @@ class StockHandler():
         UpdateFunc : The function to update the stock in question.
         horizon    : namedtuple("Horizon", ["start", "end", "interval"])
         
-        The main reason for these two functions to be different is that there may be a need to
+        The main reason for these two functions (get and update) to be different is that there may be a need to
         use different update function for simulation purposes.
     """
     def __init__(self, stockCode, GetFunc, UpdateFunc, horizon, interpolate=True):
@@ -184,6 +184,8 @@ class DummyPosition():
 
         return buyHistory, sellHistory
 
+
+
     def PlotActionsCapital(self, saveFileName, showFlag = False):
         buyHistory, sellHistory = self.ParseActions()
         idx = np.argwhere(~np.isnan(buyHistory))
@@ -211,23 +213,54 @@ class DummyPosition():
         figure.set_size_inches(16,9)
         plt.tight_layout()
 
-        plt.savefig("./Figures/" + saveFileName + ".png", format = "png", dpi=400)
+        plt.savefig("./Figures/" + saveFileName + ".png", format = "png", dpi=300)
         if showFlag == True:
             plt.show()
+
+
 
     def PlotActionsCandle(self, saveFileName, showFlag = False):
         buyHistory, sellHistory = self.ParseActions()
         idx = np.argwhere(~np.isnan(buyHistory))
         idx = idx.flatten()
-        buys = self.dataFrame["Value"][idx]
+        buys = self.dataFrame["Close"][idx]
 
         idxSell = np.argwhere(~np.isnan(sellHistory))
         idxSell = idxSell.flatten()
-        sells = self.dataFrame["Value"][idxSell]
+        sells = self.dataFrame["Close"][idxSell]
 
         apd = [mpf.make_addplot(buyHistory,type='scatter', markersize=50,marker='^'), mpf.make_addplot(sellHistory,type='scatter', markersize=50,marker='v')]
         saveFileName = "./Figures/" + saveFileName + "-candle" + ".png"
-        mpf.plot(self.dataFrame, addplot=apd, type="candle", savefig=saveFileName) 
+        mpf.plot(self.dataFrame, addplot=apd, type="candle", savefig=saveFileName)
+
+
+
+    def PlotActionsPrice(self, saveFileName, showFlag = False):
+        buyHistory, sellHistory = self.ParseActions()
+        idx = np.argwhere(~np.isnan(buyHistory))
+        idx = idx.flatten()
+        buys = self.dataFrame["Close"][idx]
+
+        idxSell = np.argwhere(~np.isnan(sellHistory))
+        idxSell = idxSell.flatten()
+        sells = self.dataFrame["Close"][idxSell]
+
+        fig, ax1 = plt.subplots()
+        ax1.plot(self.dataFrame.index, self.dataFrame["Close"], "r", label="Price")
+        ax1.scatter(self.dataFrame.index[idx], buys, s=200, marker="^", label="Long")
+        ax1.scatter(self.dataFrame.index[idxSell], sells, s=200, marker="v", label="Short")
+        ax1.set_xlabel("Date", fontsize=20)
+        ax1.set_ylabel("Price", fontsize=20)
+        ax1.legend(loc="upper left", fontsize=14)
+        ax1.tick_params(labelsize=15)
+        # ax1.set_aspect()
+        figure = plt.gcf()
+        figure.set_size_inches(16,9)
+        plt.tight_layout()
+
+        plt.savefig("./Figures/" + saveFileName + ".png", format = "png", dpi=300)
+        if showFlag == True:
+            plt.show()
 
 
 

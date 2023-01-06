@@ -62,14 +62,14 @@ fileName = "APPL-2123-v1"
 start = time.time()
 
 agent = tdqn.TDQNAgent(trainingEnvironment, testingEnvironment, tdqnSettings, networkSettings, optimSettings)
-agent.Training()
+agent.Training(verbose=True)
 agent.SaveModel(fileName)
 # agent.LoadModel("MyModel3")
 agent.Testing()
 
 end = time.time()
 print("In Seconds: {}".format(end - start))
-print("In Minutes: {}".format((end - start))/60)
+print("In Minutes: {}".format((end - start)/60))
 
 posTesting.PlotActionsCapital(fileName + "-Capital", showFlag=True)
 agent.PlotLoss(fileName + "-Loss", showFlag=True)

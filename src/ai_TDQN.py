@@ -122,19 +122,19 @@ class TDQNAgent():
         highPrices = [state[2][i] for i in range(len(state[2]))]
         volumes = [state[3][i] for i in range(len(state[3]))]
 
-        # 1. Close price => returns => MinMax normalization
+
         returns = [(closePrices[i]-closePrices[i-1])/closePrices[i-1] for i in range(1, len(closePrices))]
         if coeffs["Returns"][0] != coeffs["Returns"][1]:
             state[0] = [((x - coeffs["Returns"][0])/(coeffs["Returns"][1] - coeffs["Returns"][0])) for x in returns]
         else:
             state[0] = [0 for x in returns]
-        # 2. Low/High prices => Delta prices => MinMax normalization
+
         deltaPrice = [abs(highPrices[i]-lowPrices[i]) for i in range(1, len(lowPrices))]
         if coeffs["DeltaPrice"][0] != coeffs["DeltaPrice"][1]:
             state[1] = [((x - coeffs["DeltaPrice"][0])/(coeffs["DeltaPrice"][1] - coeffs["DeltaPrice"][0])) for x in deltaPrice]
         else:
             state[1] = [0 for x in deltaPrice]
-        # 3. Close/Low/High prices => Close price position => No normalization required
+
         closePricePosition = []
         for i in range(1, len(closePrices)):
             deltaPrice = abs(highPrices[i]-lowPrices[i])
@@ -147,7 +147,7 @@ class TDQNAgent():
             state[2] = [((x - coeffs["HighLow"][0])/(coeffs["HighLow"][1] - coeffs["HighLow"][0])) for x in closePricePosition]
         else:
             state[2] = [0.5 for x in closePricePosition]
-        # 4. Volumes => MinMax normalization
+
         volumes = [volumes[i] for i in range(1, len(volumes))]
         if coeffs["Volume"][0] != coeffs["Volume"][1]:
             state[3] = [((x - coeffs["Volume"][0])/(coeffs["Volume"][1] - coeffs["Volume"][0])) for x in volumes]
@@ -166,6 +166,29 @@ class TDQNAgent():
 
 
     def ChooseAction(self, state, previousAction, trainingFlag = True):
+        
+        if trainingFlag == True:
+            # sample = random.random()
+            # alphaRandom = random.random()
+            iteration = self.iteration
+            self.iteration += 1
+
+            if random.random() > self.GetEpsilon(iteration):
+               return self.ChooseAction(state, previousAction, trainingFlag=False)
+            return random.randrange(self.networkSettings.outputLayerSize), 0, [0, 0]
+
+        with torch.no_grad():
+            state = torch.tensor(state, dtype=torch.float, device=self.device).unsqueeze(0)
+            output = self.PolicyNetwork(state).squeeze(0)
+            QMax, index = output.max(0)
+            action = index.item()
+            Q = QMax.item()
+            QValues = output.cpu().numpy()
+            return action, Q, QValues
+
+
+
+    def ChooseAction2(self, state, previousAction, trainingFlag = True):
         
         if trainingFlag == True:
             # sample = random.random()
@@ -332,7 +355,7 @@ class TDQNAgent():
         figure.set_size_inches(16,9)
         plt.tight_layout()
 
-        plt.savefig("./Figures/" + saveFileName + ".png", format = "png", dpi=400)
+        plt.savefig("./Figures/" + saveFileName + ".png", format = "png", dpi=300)
         if showFlag == True:
             plt.show()
 
