@@ -11,13 +11,13 @@ import random
 import os
 
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
-torch.manual_seed(0)
-random.seed(0)
-np.random.seed(0)
+# torch.manual_seed(0)
+# random.seed(0)
+# np.random.seed(0)
 
-# torch.manual_seed(44)
-# random.seed(44)
-# np.random.seed(44)
+torch.manual_seed(10)
+random.seed(10)
+np.random.seed(10)
 
 
 networkSettings = tdqn.networkSettings_(inputLayerSize=117, hiddenLayerSize=512, outputLayerSize=2, dropout=0.2)
@@ -49,7 +49,7 @@ trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
 testingHorizon = te.Horizon(splittingDate, endingDate, "1d")
 
 
-def ReadFromFile(stockName, start, end, interval, progress):
+def ReadFromFile(stockName, start, end, interval = "1d", progress = False):
     data = pd.read_csv("./Data/" + stockName, index_col=0)
     data = data.loc[start:end]
     data.index = pd.to_datetime(data.index)
