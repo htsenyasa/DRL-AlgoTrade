@@ -11,13 +11,9 @@ import random
 import os
 
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
-# torch.manual_seed(0)
-# random.seed(0)
-# np.random.seed(0)
-
-torch.manual_seed(10)
-random.seed(10)
-np.random.seed(10)
+torch.manual_seed(0)
+random.seed(0)
+np.random.seed(0)
 
 
 networkSettings = tdqn.networkSettings_(inputLayerSize=117, hiddenLayerSize=512, outputLayerSize=2, dropout=0.2)
@@ -29,11 +25,11 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   capacity=100000, 
                                   learningRate=0.0001,
                                   targetUpdateFrequency=500, 
-                                  batchSize=64, 
+                                  batchSize=32, 
                                   gradientClipping=1,
-                                  targetNetworkUpdate = 1000, 
+                                  targetNetworkUpdate = 100, 
                                   alpha=0.1, 
-                                  numberOfEpisodes = 80,
+                                  numberOfEpisodes = 50,
                                   rewardClipping = 1
                                   )
 
@@ -62,10 +58,10 @@ def InitializeTrainingTesting(stockName, identifierString, verbose = False):
     figureFileName = "./Figures/" + fileName + "/" + stockName
 
     if verbose == True:
-        print("Stock Name: " + stockName)
+        print("Stock Name: " + stockName + identifierString)
     
-    StockTraining = to.StockHandler(stockName, ReadFromFile, ReadFromFile, trainingHorizon)
-    StockTesting = to.StockHandler(stockName, ReadFromFile, ReadFromFile, testingHorizon)
+    StockTraining = to.StockHandler(stockName, yf.download, yf.download, trainingHorizon)
+    StockTesting = to.StockHandler(stockName, yf.download, yf.download, testingHorizon)
     PositionTraining = to.DummyPosition(StockTraining)
     PositionTesting = to.DummyPosition(StockTesting)
     TrainingEnvironment = te.TradingEnvironment(PositionTraining)
@@ -85,7 +81,7 @@ def InitializeTesting(stockName, identifierString, verbose = False):
     if verbose == True:
         print("Stock Name: " + stockName)
     
-    StockTesting = to.StockHandler(stockName, ReadFromFile, ReadFromFile, testingHorizon)
+    StockTesting = to.StockHandler(stockName, yf.download, yf.download, testingHorizon)
     PositionTesting = to.DummyPosition(StockTesting)
     TestingEnvironment = te.TradingEnvironment(PositionTesting)
     Agent = tdqn.TDQNAgent(TestingEnvironment, TestingEnvironment, tdqnSettings, networkSettings, optimSettings)
