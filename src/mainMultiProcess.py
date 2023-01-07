@@ -11,9 +11,9 @@ import random
 import os
 
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
-torch.manual_seed(25)
-random.seed(25)
-np.random.seed(25)
+torch.manual_seed(50)
+random.seed(50)
+np.random.seed(50)
 
 
 networkSettings = tdqn.networkSettings_(inputLayerSize=117, hiddenLayerSize=512, outputLayerSize=2, dropout=0.2)
@@ -25,11 +25,11 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   capacity=100000, 
                                   learningRate=0.0001,
                                   targetUpdateFrequency=500, 
-                                  batchSize=64, 
+                                  batchSize=32, 
                                   gradientClipping=1,
-                                  targetNetworkUpdate=500, 
+                                  targetNetworkUpdate=1000, 
                                   alpha=0.1, 
-                                  numberOfEpisodes = 70, 
+                                  numberOfEpisodes = 60, 
                                   rewardClipping = 1
                                   )
 

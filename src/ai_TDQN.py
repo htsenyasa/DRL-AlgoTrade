@@ -256,6 +256,7 @@ class TDQNAgent():
         env = self.TrainingEnvironment
         DataAugmentation = da.DataAugmentation()
         env = DataAugmentation.generate(env)[0]
+        self.currentLoss = np.nan
 
 
         for episode in range(self.tdqnSettings.numberOfEpisodes):
@@ -291,7 +292,9 @@ class TDQNAgent():
                 state = nextState
                 previousAction = action
             
+
             self.loss.append(self.currentLoss.cpu().detach().numpy())
+
         
         return self.TrainingEnvironment
 
