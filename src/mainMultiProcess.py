@@ -3,20 +3,17 @@ import yfinance as yf
 import tf_TradingOperations as to
 import ai_TradingEnvironment as te
 import ai_TDQN as tdqn
-import ai_Network as network
 import pandas as pd
 pd.options.mode.chained_assignment = None
 import torch
 import numpy as np
-import mplfinance as mpf
-import tf_DataAugmentation as da
-import matplotlib.pyplot as plt
 import random
+import os
 
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
-torch.manual_seed(33)
-random.seed(33)
-np.random.seed(33)
+torch.manual_seed(25)
+random.seed(25)
+np.random.seed(25)
 
 
 networkSettings = tdqn.networkSettings_(inputLayerSize=117, hiddenLayerSize=512, outputLayerSize=2, dropout=0.2)
@@ -30,9 +27,9 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   targetUpdateFrequency=500, 
                                   batchSize=64, 
                                   gradientClipping=1,
-                                  targetNetworkUpdate=1000, 
+                                  targetNetworkUpdate=500, 
                                   alpha=0.1, 
-                                  numberOfEpisodes = 80, 
+                                  numberOfEpisodes = 70, 
                                   rewardClipping = 1
                                   )
 
@@ -57,6 +54,8 @@ def ReadFromFile(stockName, start, end, interval, progress):
 
 def InitializeTrainingTesting(stockName, identifierString, verbose = False):
     fileName = stockName + identifierString
+    modelFileName = "./Models/" + fileName + "/" + stockName
+    figureFileName = "./Figures/" + fileName + "/" + stockName
 
     if verbose == True:
         print("Stock Name: " + stockName)
@@ -69,11 +68,11 @@ def InitializeTrainingTesting(stockName, identifierString, verbose = False):
     TestingEnvironment = te.TradingEnvironment(PositionTesting)
     Agent = tdqn.TDQNAgent(TrainingEnvironment, TestingEnvironment, tdqnSettings, networkSettings, optimSettings)
     Agent.Training(verbose=False)
-    Agent.SaveModel(fileName)
+    Agent.SaveModel(modelFileName)
     Agent.Testing()
-    PositionTesting.PlotActionsCapital(fileName + "-Capital", showFlag=False)
-    PositionTesting.PlotActionsPrice(fileName + "-Price", showFlag=False)
-    Agent.PlotLoss(fileName + "-Loss", showFlag=False)
+    PositionTesting.PlotActionsCapital(figureFileName + "-Capital", showFlag=False)
+    PositionTesting.PlotActionsPrice(figureFileName + "-Price", showFlag=False)
+    Agent.PlotLoss(figureFileName + "-Loss", showFlag=False)
 
 
 def InitializeTesting(stockName, identifierString, verbose = False):
@@ -86,19 +85,28 @@ def InitializeTesting(stockName, identifierString, verbose = False):
     PositionTesting = to.DummyPosition(StockTesting)
     TestingEnvironment = te.TradingEnvironment(PositionTesting)
     Agent = tdqn.TDQNAgent(TestingEnvironment, TestingEnvironment, tdqnSettings, networkSettings, optimSettings)
-    Agent.LoadModel(fileName)
+    Agent.LoadModel("./Models/" + fileName)
     Agent.Testing()
-    PositionTesting.PlotActionsCapital(fileName + "-Capital", showFlag=False)
-    PositionTesting.PlotActionsPrice(fileName + "-Price", showFlag=False)
-    Agent.PlotLoss(fileName + "-Loss", showFlag=False)
+    PositionTesting.PlotActionsCapital("./Figures/" + fileName + "-Capital", showFlag=False)
+    PositionTesting.PlotActionsPrice("./Figures/" + fileName + "-Price", showFlag=False)
+    Agent.PlotLoss("./Figures/" + fileName + "-Loss", showFlag=False)
 
 
 if __name__ == "__main__":
     mp.set_start_method('spawn')
-    listOfStocks = ["AAPL", "ISCTR.IS"]
+    listOfStocksNames = ["AAPL", "ISCTR.IS"]
     # listOfStocks = ["ISCTR.IS"]
-    identifier = "-1820-{}E-{}B".format(tdqnSettings.numberOfEpisodes, tdqnSettings.batchSize)
-    processList = [mp.Process(target=InitializeTrainingTesting, args = (listOfStocks[i], identifier, True)) for i in range(len(listOfStocks))]
+    identifier = "-1820-{}E-{}B-{}U".format(tdqnSettings.numberOfEpisodes, tdqnSettings.batchSize, tdqnSettings.targetNetworkUpdate)
+
+    paths = ["Models", "Figures"]
+
+    for path in paths:
+        for stockName in listOfStocksNames:
+            dirs = path + "/" + stockName + identifier
+            if not os.path.exists(dirs):
+                os.makedirs(dirs, exist_ok=True)
+
+    processList = [mp.Process(target=InitializeTrainingTesting, args = (listOfStocksNames[i], identifier, True)) for i in range(len(listOfStocksNames))]
     
     for process in processList:
         process.start()

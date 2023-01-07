@@ -168,12 +168,11 @@ class TDQNAgent():
     def ChooseAction(self, state, previousAction, trainingFlag = True):
         
         if trainingFlag == True:
-            # sample = random.random()
-            # alphaRandom = random.random()
+            sample = random.random()
             iteration = self.iteration
             self.iteration += 1
 
-            if random.random() > self.GetEpsilon(iteration):
+            if sample > self.GetEpsilon(iteration):
                return self.ChooseAction(state, previousAction, trainingFlag=False)
             return random.randrange(self.networkSettings.outputLayerSize), 0, [0, 0]
 
@@ -319,23 +318,23 @@ class TDQNAgent():
 
 
     def SaveModel(self, fileName):
-        lossFileName = "./Models/" + fileName + "-loss"
+        lossFileName = fileName + "-loss"
         lossFile = open(lossFileName, "wb")
         pickle.dump(self.loss, lossFile)
         lossFile.close()
 
-        modelFileName = "./Models/" + fileName
+        modelFileName = fileName + "-model"
         torch.save(self.PolicyNetwork.state_dict(), modelFileName)
 
 
 
     def LoadModel(self, fileName):
-        lossFileName = "./Models/" + fileName + "-loss"
+        lossFileName = fileName + "-loss"
         lossFile = open(lossFileName, "rb")
         self.loss = pickle.load(lossFile)
         lossFile.close()
 
-        modelFileName = "./Models/" + fileName
+        modelFileName = fileName + "-model"
         model = torch.load(modelFileName, map_location=self.device)
         self.PolicyNetwork.load_state_dict(model)
         self.TargetNetwork.load_state_dict(model)
@@ -355,7 +354,7 @@ class TDQNAgent():
         figure.set_size_inches(16,9)
         plt.tight_layout()
 
-        plt.savefig("./Figures/" + saveFileName + ".png", format = "png", dpi=300)
+        plt.savefig(saveFileName + ".png", format = "png", dpi=300)
         if showFlag == True:
             plt.show()
 
