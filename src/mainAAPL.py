@@ -11,9 +11,9 @@ import random
 import os
 
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
-torch.manual_seed(33)
-random.seed(33)
-np.random.seed(33)
+torch.manual_seed(0)
+random.seed(0)
+np.random.seed(0)
 
 # torch.manual_seed(44)
 # random.seed(44)
@@ -29,11 +29,11 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   capacity=100000, 
                                   learningRate=0.0001,
                                   targetUpdateFrequency=500, 
-                                  batchSize=32, 
+                                  batchSize=64, 
                                   gradientClipping=1,
                                   targetNetworkUpdate = 1000, 
                                   alpha=0.1, 
-                                  numberOfEpisodes = 60,
+                                  numberOfEpisodes = 80,
                                   rewardClipping = 1
                                   )
 
@@ -71,7 +71,7 @@ def InitializeTrainingTesting(stockName, identifierString, verbose = False):
     TrainingEnvironment = te.TradingEnvironment(PositionTraining)
     TestingEnvironment = te.TradingEnvironment(PositionTesting)
     Agent = tdqn.TDQNAgent(TrainingEnvironment, TestingEnvironment, tdqnSettings, networkSettings, optimSettings)
-    Agent.Training(verbose=False)
+    Agent.Training(verbose=True)
     Agent.SaveModel(modelFileName)
     Agent.Testing()
     PositionTesting.PlotActionsCapital(figureFileName + "-Capital", showFlag=False)
@@ -98,7 +98,7 @@ def InitializeTesting(stockName, identifierString, verbose = False):
 
 if __name__ == "__main__":
     mp.set_start_method('spawn')
-    listOfStocksNames = ["AAPL", "ISCTR.IS"]
+    listOfStocksNames = ["AAPL"]
     identifier = "-1820-{}E-{}B-{}U".format(tdqnSettings.numberOfEpisodes, tdqnSettings.batchSize, tdqnSettings.targetNetworkUpdate)
 
     paths = ["Models", "Figures"]
