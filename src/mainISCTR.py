@@ -77,6 +77,8 @@ def InitializeTrainingTesting(stockName, identifierString, verbose = False):
 
 def InitializeTesting(stockName, identifierString, verbose = False):
     fileName = stockName + identifierString
+    modelFileName = "./Models/" + fileName + "/" + stockName
+    figureFileName = "./Figures/" + fileName + "/" + stockName
 
     if verbose == True:
         print("Stock Name: " + stockName)
@@ -85,27 +87,27 @@ def InitializeTesting(stockName, identifierString, verbose = False):
     PositionTesting = to.DummyPosition(StockTesting)
     TestingEnvironment = te.TradingEnvironment(PositionTesting)
     Agent = tdqn.TDQNAgent(TestingEnvironment, TestingEnvironment, tdqnSettings, networkSettings, optimSettings)
-    Agent.LoadModel("./Models/" + fileName)
+    Agent.LoadModel(modelFileName)
     Agent.Testing()
-    PositionTesting.PlotActionsCapital("./Figures/" + fileName + "-Capital", showFlag=False)
-    PositionTesting.PlotActionsPrice("./Figures/" + fileName + "-Price", showFlag=False)
-    Agent.PlotLoss("./Figures/" + fileName + "-Loss", showFlag=False)
+    PositionTesting.PlotActionsCapital(figureFileName + "-Capital", showFlag=False)
+    PositionTesting.PlotActionsPrice(figureFileName + "-Price", showFlag=False)
+    Agent.PlotLoss(figureFileName + "-Loss", showFlag=False)
 
 
 if __name__ == "__main__":
     mp.set_start_method('spawn')
     listOfStocksNames = ["ISCTR.IS"]
-    identifier = "-1820-{}E-{}B-{}U".format(tdqnSettings.numberOfEpisodes, tdqnSettings.batchSize, tdqnSettings.targetNetworkUpdate)
+    identifierString = "-1820-{}E-{}B-{}U".format(tdqnSettings.numberOfEpisodes, tdqnSettings.batchSize, tdqnSettings.targetNetworkUpdate)
 
     paths = ["Models", "Figures"]
 
     for path in paths:
         for stockName in listOfStocksNames:
-            dirs = path + "/" + stockName + identifier
+            dirs = path + "/" + stockName + identifierString
             if not os.path.exists(dirs):
                 os.makedirs(dirs, exist_ok=True)
 
-    processList = [mp.Process(target=InitializeTrainingTesting, args = (listOfStocksNames[i], identifier, True)) for i in range(len(listOfStocksNames))]
+    processList = [mp.Process(target=InitializeTrainingTesting, args = (listOfStocksNames[i], identifierString, True)) for i in range(len(listOfStocksNames))]
     
     for process in processList:
         process.start()

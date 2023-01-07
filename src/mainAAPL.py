@@ -77,6 +77,8 @@ def InitializeTrainingTesting(stockName, identifierString, verbose = False):
 
 def InitializeTesting(stockName, identifierString, verbose = False):
     fileName = stockName + identifierString
+    modelFileName = "./Models/" + fileName + "/" + stockName
+    figureFileName = "./Figures/" + fileName + "/" + stockName
 
     if verbose == True:
         print("Stock Name: " + stockName)
@@ -85,11 +87,11 @@ def InitializeTesting(stockName, identifierString, verbose = False):
     PositionTesting = to.DummyPosition(StockTesting)
     TestingEnvironment = te.TradingEnvironment(PositionTesting)
     Agent = tdqn.TDQNAgent(TestingEnvironment, TestingEnvironment, tdqnSettings, networkSettings, optimSettings)
-    Agent.LoadModel("./Models/" + fileName)
+    Agent.LoadModel(modelFileName)
     Agent.Testing()
-    PositionTesting.PlotActionsCapital("./Figures/" + fileName + "-Capital", showFlag=False)
-    PositionTesting.PlotActionsPrice("./Figures/" + fileName + "-Price", showFlag=False)
-    Agent.PlotLoss("./Figures/" + fileName + "-Loss", showFlag=False)
+    PositionTesting.PlotActionsCapital(figureFileName + "-Capital", showFlag=False)
+    PositionTesting.PlotActionsPrice(figureFileName + "-Price", showFlag=False)
+    Agent.PlotLoss(figureFileName + "-Loss", showFlag=False)
 
 
 if __name__ == "__main__":

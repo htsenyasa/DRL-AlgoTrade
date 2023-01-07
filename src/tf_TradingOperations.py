@@ -163,6 +163,14 @@ class DummyPosition():
         self.dataFrame['Returns'][tick] = (self.dataFrame['Value'][tick] - self.dataFrame['Value'][prev])/self.dataFrame['Value'][prev]
 
 
+
+    # def CalculateAnnualReturn(self):
+    #     cash = self.dataFrame["Cash"].values[0]
+    #     lots = int(cash // self.dataFrame["Close"].values[0])
+    #     capital = lots * self.dataFrame["Close"].values[-1]
+
+
+
     def ParseActions(self):
         actions = self.dataFrame["Position"].to_numpy(dtype=int)
         index = []
