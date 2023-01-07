@@ -256,8 +256,7 @@ class TDQNAgent():
         env = self.TrainingEnvironment
         DataAugmentation = da.DataAugmentation()
         env = DataAugmentation.generate(env)[0]
-        self.currentLoss = np.nan
-
+        self.currentLoss = torch.tensor(np.nan, device=self.device)
 
         for episode in range(self.tdqnSettings.numberOfEpisodes):
 
@@ -294,7 +293,6 @@ class TDQNAgent():
             
 
             self.loss.append(self.currentLoss.cpu().detach().numpy())
-
         
         return self.TrainingEnvironment
 
