@@ -14,3 +14,5 @@ To generate ISCTR results run mainISCTR.py
 To generate both of them simultaneously, you may use mainMultiprocess.py
 
 Code also requires internet connection to download stock data from yahoo finance.
+
+Disclaimer: tf_DataAugmentation.py is outsource code, I do not own it.
