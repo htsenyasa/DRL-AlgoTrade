@@ -27,9 +27,9 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   targetUpdateFrequency=500, 
                                   batchSize=32, 
                                   gradientClipping=1,
-                                  targetNetworkUpdate = 1000, 
+                                  targetNetworkUpdate = 100, 
                                   alpha=0.1, 
-                                  numberOfEpisodes = 60,
+                                  numberOfEpisodes = 50,
                                   rewardClipping = 1
                                   )
 
