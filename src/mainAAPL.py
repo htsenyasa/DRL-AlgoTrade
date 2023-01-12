@@ -25,7 +25,7 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   capacity=100000, 
                                   learningRate=0.0001,
                                   targetUpdateFrequency=500, 
-                                  batchSize=32, 
+                                  batchSize=128, 
                                   gradientClipping=1,
                                   targetNetworkUpdate = 100, 
                                   alpha=0.1, 
@@ -37,8 +37,8 @@ optimSettings = tdqn.optimSettings_(L2Factor=0.000001)
 
 
 startingDate = '2012-1-1'
-splittingDate = '2018-1-1'
-endingDate = '2020-1-1'
+splittingDate = '2021-1-1'
+endingDate = '2023-1-11'
 
 
 trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")

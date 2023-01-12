@@ -25,7 +25,7 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   capacity=100000, 
                                   learningRate=0.0001,
                                   targetUpdateFrequency=500, 
-                                  batchSize=32, 
+                                  batchSize=128, 
                                   gradientClipping=1,
                                   targetNetworkUpdate = 100, 
                                   alpha=0.1, 
@@ -58,16 +58,16 @@ def InitializeTrainingTesting(stockName, identifierString, verbose = False):
     figureFileName = "./Figures/" + fileName + "/" + stockName
 
     if verbose == True:
-        print("Stock Name: " + stockName)
+        print("Stock Name: " + stockName + identifierString)
     
-    StockTraining = to.StockHandler(stockName, ReadFromFile, ReadFromFile, trainingHorizon)
-    StockTesting = to.StockHandler(stockName, ReadFromFile, ReadFromFile, testingHorizon)
+    StockTraining = to.StockHandler(stockName, yf.download, yf.download, trainingHorizon)
+    StockTesting = to.StockHandler(stockName, yf.download, yf.download, testingHorizon)
     PositionTraining = to.DummyPosition(StockTraining)
     PositionTesting = to.DummyPosition(StockTesting)
     TrainingEnvironment = te.TradingEnvironment(PositionTraining)
     TestingEnvironment = te.TradingEnvironment(PositionTesting)
     Agent = tdqn.TDQNAgent(TrainingEnvironment, TestingEnvironment, tdqnSettings, networkSettings, optimSettings)
-    Agent.Training(verbose=False)
+    Agent.Training(verbose=True)
     Agent.SaveModel(modelFileName)
     Agent.Testing()
     PositionTesting.PlotActionsCapital(figureFileName + "-Capital", showFlag=False)
@@ -77,19 +77,21 @@ def InitializeTrainingTesting(stockName, identifierString, verbose = False):
 
 def InitializeTesting(stockName, identifierString, verbose = False):
     fileName = stockName + identifierString
+    modelFileName = "./Models/" + fileName + "/" + stockName
+    figureFileName = "./Figures/" + fileName + "/" + stockName
 
     if verbose == True:
         print("Stock Name: " + stockName)
     
-    StockTesting = to.StockHandler(stockName, ReadFromFile, ReadFromFile, testingHorizon)
+    StockTesting = to.StockHandler(stockName, yf.download, yf.download, testingHorizon)
     PositionTesting = to.DummyPosition(StockTesting)
     TestingEnvironment = te.TradingEnvironment(PositionTesting)
     Agent = tdqn.TDQNAgent(TestingEnvironment, TestingEnvironment, tdqnSettings, networkSettings, optimSettings)
-    Agent.LoadModel("./Models/" + fileName)
+    Agent.LoadModel(modelFileName)
     Agent.Testing()
-    PositionTesting.PlotActionsCapital("./Figures/" + fileName + "-Capital", showFlag=False)
-    PositionTesting.PlotActionsPrice("./Figures/" + fileName + "-Price", showFlag=False)
-    Agent.PlotLoss("./Figures/" + fileName + "-Loss", showFlag=False)
+    PositionTesting.PlotActionsCapital(figureFileName + "-Capital", showFlag=False)
+    PositionTesting.PlotActionsPrice(figureFileName + "-Price", showFlag=False)
+    Agent.PlotLoss(figureFileName + "-Loss", showFlag=False)
 
 
 if __name__ == "__main__":
