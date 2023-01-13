@@ -261,7 +261,8 @@ class TDQNAgent():
         for episode in range(self.tdqnSettings.numberOfEpisodes):
 
             if verbose == True:
-                print("Training: Episode {}".format(episode))
+                stockCodePadded = self.TrainingEnvironment.Position.stock.stockCode.ljust(8)
+                print("{} Training: Episode {}".format(stockCodePadded, episode))
 
             env.reset()
             env.SetCustomStartingPoint(random.randrange(env.dataFrameLength))

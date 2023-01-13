@@ -25,7 +25,7 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   capacity=100000, 
                                   learningRate=0.0001,
                                   targetUpdateFrequency=500, 
-                                  batchSize=128, 
+                                  batchSize=32, 
                                   gradientClipping=1,
                                   targetNetworkUpdate = 100, 
                                   alpha=0.1, 
@@ -36,20 +36,14 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
 optimSettings = tdqn.optimSettings_(L2Factor=0.000001)
 
 
-startingDate = '2012-1-1'
-splittingDate = '2018-1-1'
-endingDate = '2020-1-1'
+startingDate = '2012-01-01'
+splittingDate = '2021-01-01'
+endingDate = '2023-01-01'
 
 
 trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
 testingHorizon = te.Horizon(splittingDate, endingDate, "1d")
 
-
-def ReadFromFile(stockName, start, end, interval, progress):
-    data = pd.read_csv("./Data/" + stockName, index_col=0)
-    data = data.loc[start:end]
-    data.index = pd.to_datetime(data.index)
-    return data
 
 
 def InitializeTrainingTesting(stockName, identifierString, verbose = False):
@@ -97,7 +91,7 @@ def InitializeTesting(stockName, identifierString, verbose = False):
 if __name__ == "__main__":
     mp.set_start_method('spawn')
     listOfStocksNames = ["AAPL", "ISCTR.IS"]
-    identifier = "-1820-{}E-{}B-{}U".format(tdqnSettings.numberOfEpisodes, tdqnSettings.batchSize, tdqnSettings.targetNetworkUpdate)
+    identifier = "-2123-{}E-{}B-{}U".format(tdqnSettings.numberOfEpisodes, tdqnSettings.batchSize, tdqnSettings.targetNetworkUpdate)
 
     paths = ["Models", "Figures"]
 
