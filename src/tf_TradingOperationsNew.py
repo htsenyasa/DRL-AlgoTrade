@@ -42,7 +42,7 @@ class StockHandler():
 
 class DummyPosition():
     """ Creates an empty dummy position for a given stock for simulation purposes"""
-    def __init__(self, stock, tick = 30, initialCash = 100_000, tradingFee = 0, epsilon=0.1):
+    def __init__(self, stock, t = 30, initialCash = 100_000, tradingFee = 0, epsilon=0.1):
         self.stock = stock
         self.LONG = 1
         self.NO_POSITION = 0
@@ -51,30 +51,28 @@ class DummyPosition():
         self.tradingFee = tradingFee
         self.epsilon = epsilon
         self.initialCash = float(initialCash)
-        self.__tick = tick # To be able reset position to initial version.
-        self.tick = tick  # Current candle. Its unit (interval e.g., "1d", "1m" etc) is dictated by the stock.dataFrame attribute
+        self.__t = t # To be able reset position to initial version.
+        self.t = t  # Current candle. Its unit (interval e.g., "1d", "1m" etc) is dictated by the stock.dataFrame attribute
 
-        self.ResetPosition() # Initialize various variables including OHLCV info.
-
-
-    def IsLong(self, tick = False):
-        if tick:
-            return self.position[tick] == self.LONG
-        return self.position[self.tick] == self.LONG
+        self.ResetPosition() # Initialize various variables including OHLCV data.
 
 
-
-    def IsShort(self, tick):
-        if tick:
-            return self.position[tick] == self.SHORT
-        return self.position[self.tick] == self.SHORT
+    def IsLong(self, t = False):
+        if t:
+            return self.position[t] == self.LONG
+        return self.position[self.t] == self.LONG
 
 
 
-    def GetPosition(self, tick):
-        if tick:
-            return self.position[self.tick]
-        return self.position[self.tick]
+    def IsShort(self, t = False):
+        if t:
+            return self.position[t] == self.SHORT
+        return self.position[self.t] == self.SHORT
+
+
+
+    def GetPosition(self, t):
+        return self.position[t]
 
 
 
@@ -96,7 +94,7 @@ class DummyPosition():
         self.returns = np.full(self.Length, 0)
         self.buyHistory = np.full(self.Length, np.nan)
         self.sellHistory = np.full(self.Length, np.nan)
-        self.tick = self.__tick
+        self.t = self.__t
 
 
 
@@ -109,33 +107,52 @@ class DummyPosition():
         return lowerBound
 
 
+    def __PreIteration(self, t):
+        self.cash[t] = self.cash[t-1]
+        self.lots[t] = self.lots[t-1]
 
-    def Buy(self, t):
-        p = t-1
-        self.position[t] = self.LONG
-        self.cash[t] = self.cash[p]
-        price = self.close[t] * (1 + self.tradingFee)
-        self.lots[t] = self.lots[p] + int(self.cash[t] // price)
-        self.cash[t] -= self.lots[t] * price
+
+    def __PostIteration(self, t):
         self.holdings[t] = self.lots[t] * self.close[t]
-        self.action[t] = self.LONG
         self.value[t] = self.holdings[t] + self.cash[t]
-        self.returns[t] = (self.value[t] - self.value[p])/self.value[p]
+        self.returns[t] = (self.value[t] - self.value[t-1])/self.value[t-1]
 
 
+    @staticmethod
+    def __Iteration(f):
+        def Iteration(*args):
+            args[0].__PreIteration(args[1])
+            f(*args)
+            args[0].__PostIteration(args[1])
+        return Iteration
 
+
+    @__Iteration
+    def Buy(self, t):
+        price = self.close[t] * (1 + self.tradingFee)
+        self.lots[t] += int(self.cash[t] // price)
+        self.cash[t] -= self.lots[t] * price
+
+
+    @__Iteration
     def Sell(self, t):
-        p = t-1
-        self.position[t] = self.SHORT
-        self.cash[t] = self.cash[p]
-        self.lots[t] = self.lots[p]
         price = self.close[t] * (1 - self.tradingFee)
         self.cash[t] += self.lots[t] * price
-        self.lots[t] = 0
-        self.holdings[t] = 0
-        self.action[t] = self.SHORT
-        self.value[t] = self.cash[t]
-        self.returns[t] = (self.value[t] - self.value[p])/self.value[p]
+        self.lots[t] -= self.lots[t] # 0
+
+
+    def GoLong(self, t):
+        if self.IsShort(t-1):
+            self.ClosePosition(t)
+
+
+
+    def ClosePosition(self, t):
+        if self.IsLong(t):
+            self.Sell(t+1)
+        elif self.IsShort(t):
+            self.Buy(t+1)
+
 
 
 

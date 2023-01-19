@@ -1,18 +1,6 @@
 import multiprocessing as mp
 import yfinance as yf
-import tf_TradingOperations as to
-import ai_TradingEnvironment as te
-import ai_TDQN as tdqn
-import pandas as pd
-pd.options.mode.chained_assignment = None
-import torch
-import numpy as np
-import random
-import os
-
-import multiprocessing as mp
-import yfinance as yf
-import tf_TradingOperations as to
+import tf_TradingOperationsNew as to
 import ai_TradingEnvironment as te
 import ai_TDQN as tdqn
 import pandas as pd
@@ -58,18 +46,10 @@ trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
 
 stock = to.StockHandler("AAPL", ReadFromFile, ReadFromFile, trainingHorizon)
 pos = to.DummyPosition(stock)
-env = te.TradingEnvironment(pos)
-
-env.step(0)
-env.step(0)
-env.step(0)
-env.step(0)
-env.step(0)
-env.step(0)
-env.step(0)
-env.step(1)
-
-# for i in range(20):
-#     env.step(random.randint(0,1))
+pos.Buy(1)
+pos.Sell(2)
+pos.Buy(3)
+pos.Sell(4)
+pos.ToDataFrame()
 
 
