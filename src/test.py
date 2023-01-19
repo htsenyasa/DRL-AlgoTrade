@@ -46,10 +46,11 @@ trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
 
 stock = to.StockHandler("AAPL", ReadFromFile, ReadFromFile, trainingHorizon)
 pos = to.DummyPosition(stock)
-pos.Buy(1)
-pos.Sell(2)
-pos.Buy(3)
-pos.Sell(4)
+pos.Sell(2, 1000)
+pos.position[2] = pos.SHORT
+pos.ClosePosition(2)
+# pos.Buy(3, 1000)
 pos.ToDataFrame()
+print(pos.dataFrame.head())
 
 

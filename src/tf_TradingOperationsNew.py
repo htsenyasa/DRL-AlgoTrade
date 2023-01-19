@@ -57,25 +57,6 @@ class DummyPosition():
         self.ResetPosition() # Initialize various variables including OHLCV data.
 
 
-    def IsLong(self, t = False):
-        if t:
-            return self.position[t] == self.LONG
-        return self.position[self.t] == self.LONG
-
-
-
-    def IsShort(self, t = False):
-        if t:
-            return self.position[t] == self.SHORT
-        return self.position[self.t] == self.SHORT
-
-
-
-    def GetPosition(self, t):
-        return self.position[t]
-
-
-
     def ResetPosition(self):
         self.dataFrame = self.stock.dataFrame.copy()        
         self.Length = len(self.dataFrame.index)
@@ -88,14 +69,28 @@ class DummyPosition():
         self.cash = np.full(self.Length, float(self.initialCash))
         self.position = np.full(self.Length, self.NO_POSITION)
         self.action = np.full(self.Length, self.NO_ACTION)
-        self.lots = np.full(self.Length, 0)
-        self.holdings = np.full(self.Length, 0)
+        self.lots = np.full(self.Length, 0, dtype=int)
+        self.holdings = np.full(self.Length, 0.0, dtype=float)
         self.value = self.holdings + self.cash
-        self.returns = np.full(self.Length, 0)
+        self.returns = np.full(self.Length, 0.0, dtype=float)
         self.buyHistory = np.full(self.Length, np.nan)
         self.sellHistory = np.full(self.Length, np.nan)
         self.t = self.__t
 
+    def IsLong(self, t = False):
+        if t:
+            return self.position[t] == self.LONG
+        return self.position[self.t] == self.LONG
+
+
+    def IsShort(self, t = False):
+        if t:
+            return self.position[t] == self.SHORT
+        return self.position[self.t] == self.SHORT
+
+
+    def GetPosition(self, t):
+        return self.position[t]
 
 
     def ComputeLowerBound(self, cash, lots, price):
@@ -128,32 +123,38 @@ class DummyPosition():
 
 
     @__Iteration
-    def Buy(self, t):
+    def Buy(self, t, lots):
         price = self.close[t] * (1 + self.tradingFee)
-        self.lots[t] += int(self.cash[t] // price)
-        self.cash[t] -= self.lots[t] * price
+        self.lots[t] += lots
+        self.cash[t] -= lots * price
 
 
     @__Iteration
-    def Sell(self, t):
+    def Sell(self, t, lots):
         price = self.close[t] * (1 - self.tradingFee)
-        self.cash[t] += self.lots[t] * price
-        self.lots[t] -= self.lots[t] # 0
+        self.cash[t] += lots * price
+        self.lots[t] -= lots
+
+
+    def GetNumberOfLots(self, t):
+        price = self.close[t] * (1+ self.tradingFee)
+        return int(self.cash[t] // price)
 
 
     def GoLong(self, t):
+        self.position[t] = self.LONG
+        lots = self.GetNumberOfLots(t)
+
         if self.IsShort(t-1):
-            self.ClosePosition(t)
+            self.ClosePosition(t-1)
 
-
+        self.Buy(t, lots)
 
     def ClosePosition(self, t):
         if self.IsLong(t):
-            self.Sell(t+1)
+            self.Sell(t+1, self.lots[t])
         elif self.IsShort(t):
-            self.Buy(t+1)
-
-
+            self.Buy(t+1, -self.lots[t])
 
 
     def ToDataFrame(self):
