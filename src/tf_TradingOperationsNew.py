@@ -3,6 +3,7 @@ import pandas as pd
 from collections import namedtuple
 import mplfinance as mpf
 import matplotlib.pyplot as plt
+# pd.set_option("display.precision", 4)
 
 signal = {"Buy": True, "Sell": False}
 Horizon = namedtuple("Horizon", ["start", "end", "interval"])
@@ -32,6 +33,11 @@ class StockHandler():
             self.dataFrame.fillna(method='bfill', inplace=True)
             self.dataFrame.fillna(0, inplace=True)
         
+        self.dataFrame["Close"] = self.dataFrame["Adj Close"]
+        self.dataFrame = self.dataFrame.drop(columns=["Adj Close"])
+
+        self.SetPrecision(2)
+
     def Update(self):
         newData = self.UpdateFunc(self.stockCode)
         if newData is None:
@@ -40,9 +46,16 @@ class StockHandler():
         return self.dataFrame
 
 
+    def SetPrecision(self, precision):
+        self.dataFrame.Open = self.dataFrame.Open.round(precision)
+        self.dataFrame.High = self.dataFrame.High.round(precision)
+        self.dataFrame.Low = self.dataFrame.Low.round(precision)
+        self.dataFrame.Close = self.dataFrame.Close.round(precision)
+
+
 class DummyPosition():
     """ Creates an empty dummy position for a given stock for simulation purposes"""
-    def __init__(self, stock, t = 30, initialCash = 100_000, tradingFee = 0, epsilon=0.1):
+    def __init__(self, stock, t = 30, initialCash = 100_000, tradingFee = 0.0, shortMargin = 0.6, epsilon=0.1):
         self.stock = stock
         self.LONG = 1
         self.NO_POSITION = 0
@@ -51,6 +64,7 @@ class DummyPosition():
         self.tradingFee = tradingFee
         self.epsilon = epsilon
         self.initialCash = float(initialCash)
+        self.shortMargin = shortMargin
         self.__t = t # To be able reset position to initial version.
         self.t = t  # Current candle. Its unit (interval e.g., "1d", "1m" etc) is dictated by the stock.dataFrame attribute
 
@@ -66,15 +80,15 @@ class DummyPosition():
         self.low = self.dataFrame.Low.values
         self.close = self.dataFrame.Close.values
         self.volume = self.dataFrame.Volume.values
-        self.cash = np.full(self.Length, float(self.initialCash))
-        self.position = np.full(self.Length, self.NO_POSITION)
-        self.action = np.full(self.Length, self.NO_ACTION)
+        self.cash = np.full(self.Length, float(self.initialCash), dtype=float)
+        self.position = np.full(self.Length, self.NO_POSITION, dtype=int)
+        self.action = np.full(self.Length, self.NO_ACTION, dtype=int)
         self.lots = np.full(self.Length, 0, dtype=int)
         self.holdings = np.full(self.Length, 0.0, dtype=float)
         self.value = self.holdings + self.cash
         self.returns = np.full(self.Length, 0.0, dtype=float)
-        self.buyHistory = np.full(self.Length, np.nan)
-        self.sellHistory = np.full(self.Length, np.nan)
+        self.buyHistory = np.full(self.Length, np.nan, dtype=float)
+        self.sellHistory = np.full(self.Length, np.nan, dtype=float)
         self.t = self.__t
 
     def IsLong(self, t = False):
@@ -105,6 +119,9 @@ class DummyPosition():
     def __PreIteration(self, t):
         self.cash[t] = self.cash[t-1]
         self.lots[t] = self.lots[t-1]
+        self.holdings[t] = self.lots[t] * self.close[t]
+        self.value[t] = self.holdings[t] + self.cash[t]
+        self.returns[t] = (self.value[t] - self.value[t-1])/self.value[t-1]
 
 
     def __PostIteration(self, t):
@@ -116,45 +133,75 @@ class DummyPosition():
     @staticmethod
     def __Iteration(f):
         def Iteration(*args):
-            args[0].__PreIteration(args[1])
+            self = args[0]
+            self.__PreIteration(args[1])
             f(*args)
-            args[0].__PostIteration(args[1])
+            self.__PostIteration(args[1])
         return Iteration
 
 
-    @__Iteration
-    def Buy(self, t, lots):
+
+    def __Buy(self, t, lots):
         price = self.close[t] * (1 + self.tradingFee)
         self.lots[t] += lots
         self.cash[t] -= lots * price
 
 
-    @__Iteration
-    def Sell(self, t, lots):
+
+    def __Sell(self, t, lots):
         price = self.close[t] * (1 - self.tradingFee)
         self.cash[t] += lots * price
         self.lots[t] -= lots
 
 
-    def GetNumberOfLots(self, t):
+
+    def GetNumberOfLots(self, t, shortFlag = False):
         price = self.close[t] * (1+ self.tradingFee)
+        if shortFlag:
+            if self.value[t] * self.shortMargin > abs(self.holdings[t]):
+                return int(((self.value[t] + self.holdings[t]) * self.shortMargin) // price)
+            else:
+                return 0
         return int(self.cash[t] // price)
 
 
+    @__Iteration
     def GoLong(self, t):
         self.position[t] = self.LONG
-        lots = self.GetNumberOfLots(t)
 
         if self.IsShort(t-1):
-            self.ClosePosition(t-1)
+            self.CloseShortPosition(t)
 
-        self.Buy(t, lots)
+        lots = self.GetNumberOfLots(t)
 
-    def ClosePosition(self, t):
-        if self.IsLong(t):
-            self.Sell(t+1, self.lots[t])
-        elif self.IsShort(t):
-            self.Buy(t+1, -self.lots[t])
+        if lots > 0:
+            self.action[t] = self.LONG
+            self.__Buy(t, lots)
+
+
+    @__Iteration
+    def GoShort(self, t):
+        self.position[t] = self.SHORT
+
+        if self.IsLong(t-1):
+            self.CloseLongPosition(t)
+
+        lots = self.GetNumberOfLots(t, shortFlag=True)
+
+        if lots > 0:
+            self.action[t] = self.SHORT
+            self.__Sell(t, lots)
+
+
+    def CloseLongPosition(self, t):
+        self.__Sell(t, abs(self.lots[t]))
+        self.__PostIteration(t)
+
+
+    def CloseShortPosition(self, t):
+        self.__Buy(t+1, abs(self.lots[t]))
+        self.__PostIteration(t)
+
 
 
     def ToDataFrame(self):
@@ -165,34 +212,6 @@ class DummyPosition():
         self.dataFrame["Holdings"] = self.holdings
         self.dataFrame["Value"] = self.value
         self.dataFrame["Returns"] = self.returns
-
-
-
-    def GoLong(self, tick):
-        prev = tick-1
-        self.dataFrame["Position"][tick] = self.LONG
-        self.dataFrame["Lots"][tick] = int(self.dataFrame["Cash"][prev] // (self.dataFrame["Close"][tick] * (1 + self.tradingFee)))
-        self.dataFrame["Cash"][tick] = self.dataFrame["Cash"][prev] - self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick] * (1 + self.tradingFee)
-        self.dataFrame["Holdings"][tick] = self.dataFrame["Lots"][tick] * self.dataFrame["Close"][tick]
-        self.dataFrame["Action"][tick] = self.LONG
-
-        self.dataFrame["Value"][tick] = self.dataFrame["Holdings"][tick] + self.dataFrame["Cash"][tick]
-        self.dataFrame['Returns'][tick] = (self.dataFrame['Value'][tick] - self.dataFrame['Value'][prev])/self.dataFrame['Value'][prev]
-
-
-
-    def GoShort(self, tick):
-        prev = tick - 1
-        self.dataFrame["Position"][tick] = self.SHORT
-        self.dataFrame["Cash"][tick] = self.dataFrame["Cash"][prev]
-        self.dataFrame["Lots"][tick] = self.dataFrame["Lots"][prev]
-        price = self.dataFrame["Close"][tick] * (1 - self.tradingFee)
-        self.dataFrame["Cash"][tick] += self.dataFrame["Lots"][tick] * price
-        self.dataFrame["Lots"][tick] = 0
-        self.dataFrame["Holdings"][tick] = 0
-        self.dataFrame["Action"][tick] = self.SHORT
-        self.dataFrame["Value"][tick] = self.dataFrame["Holdings"][tick] + self.dataFrame["Cash"][tick]
-        self.dataFrame['Returns'][tick] = (self.dataFrame['Value'][tick] - self.dataFrame['Value'][prev])/self.dataFrame['Value'][prev]
 
 
 
