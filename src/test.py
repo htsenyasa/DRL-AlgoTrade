@@ -49,10 +49,19 @@ pos = to.DummyPosition(stock)
 
 actions = [pos.GoShort, pos.GoLong]
 
-for i in range(20):
-    actions[random.randint(0,1)](i)
+# for i in range(20):
+#     pos.GoShort(i)
+# pos.GoLong(20)
 
+pos.GoShort(1)
+pos.GoShort(2)
+pos.GoShort(3)
 pos.ToDataFrame()
-print(pos.dataFrame[:20])
+print(pos.dataFrame[0:5])
+pos.NewActionBranch(3, depth=2)
+pos.GoLong(2)
+pos.GoLong(3)
+pos.ToDataFrame()
+print(pos.dataFrame[0:5])
 
 

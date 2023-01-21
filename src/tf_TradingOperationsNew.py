@@ -53,9 +53,10 @@ class StockHandler():
         self.dataFrame.Close = self.dataFrame.Close.round(precision)
 
 
+
 class DummyPosition():
     """ Creates an empty dummy position for a given stock for simulation purposes"""
-    def __init__(self, stock, t = 30, initialCash = 100_000, tradingFee = 0.0, shortMargin = 0.6, epsilon=0.1):
+    def __init__(self, stock, t = 30, initialCash = 100_000, tradingFee = 0.0, shortMargin = 0.8, epsilon=0.1):
         self.stock = stock
         self.LONG = 1
         self.NO_POSITION = 0
@@ -67,7 +68,6 @@ class DummyPosition():
         self.shortMargin = shortMargin
         self.__t = t # To be able reset position to initial version.
         self.t = t  # Current candle. Its unit (interval e.g., "1d", "1m" etc) is dictated by the stock.dataFrame attribute
-
         self.ResetPosition() # Initialize various variables including OHLCV data.
 
 
@@ -91,10 +91,13 @@ class DummyPosition():
         self.sellHistory = np.full(self.Length, np.nan, dtype=float)
         self.t = self.__t
 
+
+
     def IsLong(self, t = False):
         if t:
             return self.position[t] == self.LONG
         return self.position[self.t] == self.LONG
+
 
 
     def IsShort(self, t = False):
@@ -103,17 +106,10 @@ class DummyPosition():
         return self.position[self.t] == self.SHORT
 
 
+
     def GetPosition(self, t):
         return self.position[t]
 
-
-    def ComputeLowerBound(self, cash, lots, price):
-        deltaValues = - cash - lots * price * (1 + self.epsilon) * (1 + self.tradingFee)
-        if deltaValues < 0:
-            lowerBound = int(deltaValues // (price * (2 * self.tradingFee + (self.epsilon * (1 + self.tradingFee)))))
-        else:
-            lowerBound = int(deltaValues // (price * self.epsilon * (1 + self.tradingFee)))
-        return lowerBound
 
 
     def __PreIteration(self, t):
@@ -124,10 +120,12 @@ class DummyPosition():
         self.returns[t] = (self.value[t] - self.value[t-1])/self.value[t-1]
 
 
+
     def __PostIteration(self, t):
         self.holdings[t] = self.lots[t] * self.close[t]
         self.value[t] = self.holdings[t] + self.cash[t]
         self.returns[t] = (self.value[t] - self.value[t-1])/self.value[t-1]
+
 
 
     @staticmethod
@@ -199,7 +197,7 @@ class DummyPosition():
 
 
     def CloseShortPosition(self, t):
-        self.__Buy(t+1, abs(self.lots[t]))
+        self.__Buy(t, abs(self.lots[t]))
         self.__PostIteration(t)
 
 
@@ -214,9 +212,30 @@ class DummyPosition():
         self.dataFrame["Returns"] = self.returns
 
 
+    def NewActionBranch(self, t):
+        self.__tempCash = self.cash[t-1:t+1]
+        self.__tempPosition = self.position[t-1:t+1]
+        self.__tempAction = self.action[t-1:t+1]
+        self.__tempLots = self.lots[t-1:t+1]
+        self.__tempHoldings = self.holdings[t-1:t+1]
+        self.__tempValue = self.value[t-1:t+1]
+        self.__tempReturns = self.returns[t-1:t+1]
+
+
+    def MergeBranches(self, t):
+        self.cash[t-1:t+1] = self.__tempCash
+        self.position[t-1:t+1] = self.__tempPosition
+        self.action[t-1:t+1] = self.__tempAction
+        self.lots[t-1:t+1] = self.__tempLots
+        self.holdings[t-1:t+1] = self.__tempHoldings
+        self.value[t-1:t+1] = self.__tempValue
+        self.returns[t-1:t+1] = self.__tempReturns
+
+
+
 
     def ParseActions(self):
-        actions = self.dataFrame["Position"].to_numpy(dtype=int)
+        actions = self.position
         index = []
 
         buyHistory = np.full(self.dataFrameLength, np.nan)
@@ -230,9 +249,9 @@ class DummyPosition():
 
         for i, item in enumerate(actions):
             if item == self.LONG:
-                buyHistory[i] = self.dataFrame["Close"][i]
+                buyHistory[i] = self.close[i]
             elif item == self.SHORT:
-                sellHistory[i] = self.dataFrame["Close"][i]
+                sellHistory[i] = self.close[i]
 
         return buyHistory, sellHistory
 
@@ -242,11 +261,11 @@ class DummyPosition():
         buyHistory, sellHistory = self.ParseActions()
         idx = np.argwhere(~np.isnan(buyHistory))
         idx = idx.flatten()
-        buys = self.dataFrame["Value"][idx]
+        buys = self.value[idx]
 
         idxSell = np.argwhere(~np.isnan(sellHistory))
         idxSell = idxSell.flatten()
-        sells = self.dataFrame["Value"][idxSell]
+        sells = self.value[idxSell]
 
         # plt.plot(self.dataFrame.index, self.dataFrame["Value"], "r")
         # plt.scatter(self.dataFrame.index[idx], buys, s=200, marker="^")
