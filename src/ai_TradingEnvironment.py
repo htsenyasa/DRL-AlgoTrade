@@ -5,33 +5,50 @@ from collections import namedtuple
 
 Horizon = namedtuple("Horizon", ["start", "end", "interval"])
 
+class StateObject():
+    def __init__(self, stateLength):
+        self.open = np.empty(stateLength, dtype=float)
+        self.high = np.empty(stateLength, dtype=float)
+        self.low = np.empty(stateLength, dtype=float)
+        self.close = np.empty(stateLength, dtype=float)
+        self.volume = np.empty(stateLength, dtype=float)
+        self.position = False
+
+    def DataProcessing(self):
+        ...
+
+
 class TradingEnvironment(gym.Env):    
     def __init__(self, Position,  stateLength = 30):
         self.Position = Position 
-        self.stateLength = stateLength
-        self.tick = int(stateLength)
+        self.stateLength = int(stateLength)
+        self.t = int(stateLength)
         self.horizon = Position.stock.horizon
         self.actions = {"LONG": 1, "SHORT": 0}
 
         self.dataFrame = self.Position.dataFrame
         self.dataFrameLength = len(self.dataFrame.index)
-        self.state = self.UpdateState()
+        self.State = StateObject(stateLength) 
+        self.UpdateState()
         self.reward = 0.
         self.done = 0
 
 
     def UpdateState(self):
-        currentStateRange = slice(self.tick - self.stateLength, self.tick)
-        if self.tick == self.stateLength: 
+        currentStateRange = slice(self.t - self.stateLength, self.t)
+        if self.t == self.stateLength: # For __init__
             position = self.Position.NO_POSITION
         else:
-            position = self.dataFrame["Position"][self.tick-1]
+            position = self.Position.position[self.t]
 
-        return [self.dataFrame['Close'][currentStateRange].tolist(),
-                self.dataFrame['Low'][currentStateRange].tolist(),
-                self.dataFrame['High'][currentStateRange].tolist(),
-                self.dataFrame['Volume'][currentStateRange].tolist(),
-                [position]]
+        # No need to copy at this stage. 
+        self.State.high = self.Position.high[currentStateRange]
+        self.State.low = self.Position.low[currentStateRange]
+        self.State.close = self.Position.close[currentStateRange]
+        self.State.volume = self.Position.volume[currentStateRange]
+        self.State.position = position
+
+        return self.State
 
 
     def reset(self):
@@ -39,64 +56,36 @@ class TradingEnvironment(gym.Env):
         
         self.reward = 0.
         self.done = 0
-        self.tick = self.stateLength
+        self.t = self.stateLength
         
         self.dataFrame = self.Position.dataFrame
-        self.state = self.UpdateState()
+        self.UpdateState()
 
-        return self.state
+        return self.State
 
 
     def step(self, action):
-        # Save tick and tick - 1 entries of the dataFrame and to realize action branching -> Action, oppositeAction
-        # This is a temporary workaround for oppositeAction.
-
-        # print(self.tick)
-
-        tempDataFramePrevTick = self.dataFrame.iloc[self.tick-1]
-        tempDataFrameTick = self.dataFrame.iloc[self.tick]
-        tempDone = self.done
-
-        # Take the opposite action first.
-        oppositeAction = int(not bool(action))
-        if oppositeAction == self.actions["LONG"]:
-            self.Position.GoLong(self.tick)
-        elif oppositeAction == self.actions["SHORT"]:
-            self.Position.GoShort(self.tick)
-        
-
-        self.oppositeActionState = self.UpdateState()
-
-        oppositeActionReward = self.GetReward()
-        self.oppositeActionInfo = {"State": self.oppositeActionState, "Reward": oppositeActionReward, "Done": self.done}
-
-        # Replace by the old data back.
-        self.dataFrame.iloc[self.tick-1] = tempDataFramePrevTick
-        self.dataFrame.iloc[self.tick] = tempDataFrameTick
-        self.done = tempDone
 
         if action == self.actions["LONG"]:
-            self.Position.GoLong(self.tick)
+            self.Position.GoLong()
         elif action == self.actions["SHORT"]:
-            self.Position.GoShort(self.tick)
+            self.Position.GoShort()
             
         self.reward = self.GetReward()
 
-        self.tick += 1
-        self.state = self.UpdateState()
+        self.t += 1
+        self.UpdateState()
 
-        if self.tick == self.dataFrameLength:
+        if self.t == self.dataFrameLength:
             self.done = 1
         
-        return self.state, self.reward, self.done, self.oppositeActionInfo         
+        return self.state, self.reward, self.done   
 
 
     def GetReward(self):
-        if (self.Position.IsShort(self.tick -1)  and  self.dataFrame["Action"][self.tick] == self.Position.SHORT):
-            return (self.dataFrame["Close"][self.tick-1] - self.dataFrame["Close"][self.tick])/self.dataFrame["Close"][self.tick-1]
-        return self.dataFrame["Returns"][self.tick]
+        return self.Position.returns[self.t]
 
 
     def SetCustomStartingPoint(self, startingPoint):
-        self.tick = np.clip(startingPoint, self.stateLength, len(self.dataFrame.index))
-        self.state = self.UpdateState()
+        self.t = np.clip(startingPoint, self.stateLength, len(self.dataFrame.index))
+        self.UpdateState()

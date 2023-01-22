@@ -11,6 +11,7 @@ import numpy as np
 import tf_DataAugmentation as da
 import matplotlib.pyplot as plt
 import pickle
+from sklearn.preprocessing import MinMaxScaler
 
 tdqnSettings_ = namedtuple("tdqnSettings", ["gamma", "epsilonStart", "epsilonEnd", "epsilonDecay", 
                                             "capacity", "learningRate", "targetUpdateFrequency",
@@ -273,19 +274,11 @@ class TDQNAgent():
             while done == 0:
                 action = self.ChooseAction(state, previousAction)[0]
 
-                nextState, reward, done, oppositeActionInfo = env.step(action)
+                nextState, reward, done = env.step(action)
 
                 nextState = self.StateProcessing(nextState)
                 reward = self.RewardProcessing(reward)
                 self.ReplayMemory.Push(state, action, reward, nextState, done)
-
-              
-                oppositeAction = int(not bool(action))
-                oppositeActionReward = self.RewardProcessing(oppositeActionInfo["Reward"])
-                oppositeActionNextState = self.StateProcessing(oppositeActionInfo["State"])
-                oppositeActionDone = oppositeActionInfo["Done"]
-
-                self.ReplayMemory.Push(state, oppositeAction, oppositeActionReward, oppositeActionNextState, oppositeActionDone)
 
                 self.LearnFromMemory()
 
@@ -311,7 +304,7 @@ class TDQNAgent():
 
         while done == 0:
             action, _, _ = self.ChooseAction(state, previousAction, trainingFlag=False)
-            nextState, _, done, _ = env.step(action)
+            nextState, _, done = env.step(action)
             self.TestingEnvironment.step(action)
             state = self.StateProcessing(nextState)
 

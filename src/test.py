@@ -10,6 +10,10 @@ import numpy as np
 import random
 import os
 from cm_common import ReadFromFile
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
+from scipy.ndimage import gaussian_filter
+
 
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
 torch.manual_seed(0)
@@ -37,7 +41,7 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
 optimSettings = tdqn.optimSettings_(L2Factor=0.000001)
 
 
-startingDate = '2020-01-01'
+startingDate = '2019-01-01'
 splittingDate = '2021-01-01'
 endingDate = '2023-01-01'
 
@@ -46,22 +50,18 @@ trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
 
 stock = to.StockHandler("AAPL", ReadFromFile, ReadFromFile, trainingHorizon)
 pos = to.DummyPosition(stock)
+env = te.TradingEnvironment(pos)
 
-actions = [pos.GoShort, pos.GoLong]
+plt.plot(env.Position.dateTimeIndex, env.Position.close, label="Original")
+plt.plot(env.Position.dateTimeIndex, gaussian_filter(env.Position.close, sigma=0.7)+10, label="Gaussian")
+plt.plot(env.Position.dateTimeIndex, env.Position.dataFrame["Close"].rolling(window=4).mean()+20, label="Filter")
+plt.legend()
+plt.show()
 
-# for i in range(20):
-#     pos.GoShort(i)
-# pos.GoLong(20)
-
-pos.GoShort(1)
-pos.GoShort(2)
-pos.GoShort(3)
-pos.ToDataFrame()
-print(pos.dataFrame[0:5])
-pos.NewActionBranch(3, depth=2)
-pos.GoLong(2)
-pos.GoLong(3)
-pos.ToDataFrame()
-print(pos.dataFrame[0:5])
+# scaler = MinMaxScaler()
+# scaler.fit(env.Position.close.reshape(-1,1))
+# scaled = scaler.transform(env.Position.close.reshape(-1,1))
 
 
+# plt.plot(env.Position.dateTimeIndex, scaled)
+# plt.show()
