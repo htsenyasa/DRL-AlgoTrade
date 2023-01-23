@@ -1,6 +1,8 @@
 import gym
 import numpy as np
 from collections import namedtuple
+from sklearn.preprocessing import MinMaxScaler
+from scipy.ndimage import gaussian_filter
 
 
 Horizon = namedtuple("Horizon", ["start", "end", "interval"])
@@ -13,9 +15,6 @@ class StateObject():
         self.close = np.empty(stateLength, dtype=float)
         self.volume = np.empty(stateLength, dtype=float)
         self.position = False
-
-    def DataProcessing(self):
-        ...
 
 
 class TradingEnvironment(gym.Env):    
@@ -49,6 +48,11 @@ class TradingEnvironment(gym.Env):
         self.State.position = position
 
         return self.State
+
+
+    def DataPreProcessing(self):
+        self.Scaler = MinMaxScaler()
+        self.Scaler.fit(self.Position.dataFrame[["Close", "High", "Low", "Volume"]])
 
 
     def reset(self):
