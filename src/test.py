@@ -50,16 +50,20 @@ trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
 
 stock = to.StockHandler("AAPL", ReadFromFile, ReadFromFile, trainingHorizon)
 pos = to.DummyPosition(stock)
-env = te.TradingEnvironment(pos)
+# env = te.TradingEnvironment(pos)
 
-plt.plot(env.Position.dateTimeIndex, env.Position.close, label="Original")
-plt.plot(env.Position.dateTimeIndex, gaussian_filter(env.Position.close, sigma=0.7)+10, label="Gaussian")
-plt.plot(env.Position.dateTimeIndex, env.Position.dataFrame["Close"].rolling(window=4).mean()+20, label="Filter")
-plt.legend()
-plt.show()
+# plt.plot(env.Position.dateTimeIndex, env.Position.close, label="Original")
+# plt.plot(env.Position.dateTimeIndex, gaussian_filter(env.Position.close, sigma=0.7)+10, label="Gaussian")
+# plt.plot(env.Position.dateTimeIndex, env.Position.dataFrame["Close"].rolling(window=4).mean()+20, label="Filter")
+# plt.legend()
+# plt.show()
+
+
+
+
 
 # scaler = MinMaxScaler()
-# scaler.fit(env.Position.close.reshape(-1,1))
+# scaler.fit(env.Position.dataFrame)
 # scaled = scaler.transform(env.Position.close.reshape(-1,1))
 
 

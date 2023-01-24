@@ -8,13 +8,22 @@ from scipy.ndimage import gaussian_filter
 Horizon = namedtuple("Horizon", ["start", "end", "interval"])
 
 class StateObject():
-    def __init__(self, stateLength):
-        self.open = np.empty(stateLength, dtype=float)
+    def __init__(self, principalPosition, ancillaryStocks, stateLength):
+        self.Position = principalPosition
+        self.ancillaryStocks = ancillaryStocks
         self.high = np.empty(stateLength, dtype=float)
         self.low = np.empty(stateLength, dtype=float)
         self.close = np.empty(stateLength, dtype=float)
         self.volume = np.empty(stateLength, dtype=float)
         self.position = False
+        self.state = np.column_stack((self.high, self.low, self.close, self.volume, self.position))
+
+    def InitScalar(self):
+        self.scaler = MinMaxScaler()
+        self.scaler.fit(self.Position.dataFrame[["High", "Low", "Close", "Volume"]].values)
+
+    def ScaleState(self, state):
+        self.scaler.transform(state.T[:-1].T)
 
 
 class TradingEnvironment(gym.Env):    
@@ -27,7 +36,7 @@ class TradingEnvironment(gym.Env):
 
         self.dataFrame = self.Position.dataFrame
         self.dataFrameLength = len(self.dataFrame.index)
-        self.State = StateObject(stateLength) 
+        self.State = StateObject(Position, Position, stateLength) 
         self.UpdateState()
         self.reward = 0.
         self.done = 0
@@ -35,7 +44,7 @@ class TradingEnvironment(gym.Env):
 
     def UpdateState(self):
         currentStateRange = slice(self.t - self.stateLength, self.t)
-        if self.t == self.stateLength: # For __init__
+        if self.t == self.stateLength: # For __init__ (this if may be redundant.)
             position = self.Position.NO_POSITION
         else:
             position = self.Position.position[self.t]
@@ -50,9 +59,17 @@ class TradingEnvironment(gym.Env):
         return self.State
 
 
-    def DataPreProcessing(self):
-        self.Scaler = MinMaxScaler()
-        self.Scaler.fit(self.Position.dataFrame[["Close", "High", "Low", "Volume"]])
+    def InitScaler(self):
+        self.Scalers = []
+        columns = ["High", "Low", "Close", "Volume"]
+        for i in range(columns): # No need to scale position
+            Scaler = MinMaxScaler()
+            Scaler.fit(self.Position.dataFrame[[columns[i]]])
+            self.Scalers.append(Scaler)
+
+
+    def Scale(self):
+        ...
 
 
     def reset(self):
