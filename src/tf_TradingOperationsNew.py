@@ -56,7 +56,7 @@ class StockHandler():
 
 class DummyPosition():
     """ Creates an empty dummy position for a given stock for simulation purposes"""
-    def __init__(self, stock, t = 1, initialCash = 100_000, tradingFee = 0.0, shortMargin = 0.8):
+    def __init__(self, stock, t = 30, initialCash = 100_000, tradingFee = 0.0, shortMargin = 0.8):
         self.stock = stock
         self.LONG = 1
         self.NO_POSITION = 0

@@ -8,68 +8,53 @@ from scipy.ndimage import gaussian_filter
 Horizon = namedtuple("Horizon", ["start", "end", "interval"])
 
 class StateObject():
-    def __init__(self, principalPosition, ancillaryStocks, stateLength):
-        self.Position = principalPosition
+    def __init__(self, principalPosition, ancillaryStocks):
+        self.Position = principalPosition # Must be a reference to the position class passed to the trading env.
         self.ancillaryStocks = ancillaryStocks
-        self.high = np.empty(stateLength, dtype=float)
-        self.low = np.empty(stateLength, dtype=float)
-        self.close = np.empty(stateLength, dtype=float)
-        self.volume = np.empty(stateLength, dtype=float)
-        self.position = False
-        self.state = np.column_stack((self.high, self.low, self.close, self.volume, self.position))
+        self.__columns = ["High", "Low", "Close", "Volume"]
+        self.InitScaler()
 
-    def InitScalar(self):
+    def InitScaler(self):
         self.scaler = MinMaxScaler()
-        self.scaler.fit(self.Position.dataFrame[["High", "Low", "Close", "Volume"]].values)
+        self.scaler.fit(self.Position.dataFrame[self.__columns].values)
 
-    def ScaleState(self, state):
-        self.scaler.transform(state.T[:-1].T)
+    def ScaleState(self, partialState):
+        return self.scaler.transform(partialState)
+
+    def GetState(self, currentRange, position):
+        partialState = self.ScaleState(np.column_stack((self.Position.high[currentRange],
+                                                       self.Position.low[currentRange],
+                                                       self.Position.close[currentRange],
+                                                       self.Position.volume[currentRange])))
+        return np.concatenate((partialState.flatten("F"), [position]))
+        
 
 
 class TradingEnvironment(gym.Env):    
     def __init__(self, Position,  stateLength = 30):
         self.Position = Position 
+
         self.stateLength = int(stateLength)
         self.t = int(stateLength)
+        self.SetStartingPoint(self.t)
+
         self.horizon = Position.stock.horizon
         self.actions = {"LONG": 1, "SHORT": 0}
 
-        self.dataFrame = self.Position.dataFrame
-        self.dataFrameLength = len(self.dataFrame.index)
-        self.State = StateObject(Position, Position, stateLength) 
-        self.UpdateState()
+        self.__State = StateObject(Position, None)
+        self.state = self.UpdateState()
         self.reward = 0.
         self.done = 0
 
 
     def UpdateState(self):
-        currentStateRange = slice(self.t - self.stateLength, self.t)
-        if self.t == self.stateLength: # For __init__ (this if may be redundant.)
+        currentRange = slice(self.t - self.stateLength, self.t)
+        if self.t == self.stateLength: # For __init__ (this may be redundant.)
             position = self.Position.NO_POSITION
         else:
             position = self.Position.position[self.t]
 
-        # No need to copy at this stage. 
-        self.State.high = self.Position.high[currentStateRange]
-        self.State.low = self.Position.low[currentStateRange]
-        self.State.close = self.Position.close[currentStateRange]
-        self.State.volume = self.Position.volume[currentStateRange]
-        self.State.position = position
-
-        return self.State
-
-
-    def InitScaler(self):
-        self.Scalers = []
-        columns = ["High", "Low", "Close", "Volume"]
-        for i in range(columns): # No need to scale position
-            Scaler = MinMaxScaler()
-            Scaler.fit(self.Position.dataFrame[[columns[i]]])
-            self.Scalers.append(Scaler)
-
-
-    def Scale(self):
-        ...
+        return self.__State.GetState(currentRange, position)
 
 
     def reset(self):
@@ -79,10 +64,9 @@ class TradingEnvironment(gym.Env):
         self.done = 0
         self.t = self.stateLength
         
-        self.dataFrame = self.Position.dataFrame
-        self.UpdateState()
+        self.state = self.UpdateState()
 
-        return self.State
+        return self.state
 
 
     def step(self, action):
@@ -94,10 +78,10 @@ class TradingEnvironment(gym.Env):
             
         self.reward = self.GetReward()
 
+        self.state = self.UpdateState()
         self.t += 1
-        self.UpdateState()
 
-        if self.t == self.dataFrameLength:
+        if self.t == self.Position.Length:
             self.done = 1
         
         return self.state, self.reward, self.done   
@@ -107,6 +91,6 @@ class TradingEnvironment(gym.Env):
         return self.Position.returns[self.t]
 
 
-    def SetCustomStartingPoint(self, startingPoint):
-        self.t = np.clip(startingPoint, self.stateLength, len(self.dataFrame.index))
-        self.UpdateState()
+    def SetStartingPoint(self, startingPoint):
+        self.t = np.clip(startingPoint, self.stateLength, self.Position.Length)
+        self.Position.SetStartingPoint(self.t)
