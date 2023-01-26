@@ -1,6 +1,6 @@
 import multiprocessing as mp
 import yfinance as yf
-import tf_TradingOperations as to
+import tf_TradingOperationsNew as to
 import ai_TradingEnvironment as te
 import ai_TDQN as tdqn
 import pandas as pd
@@ -9,6 +9,7 @@ import torch
 import numpy as np
 import random
 import os
+from cm_common import ReadFromFile
 
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
 torch.manual_seed(0)
@@ -16,7 +17,7 @@ random.seed(0)
 np.random.seed(0)
 
 
-networkSettings = tdqn.networkSettings_(inputLayerSize=117, hiddenLayerSize=512, outputLayerSize=2, dropout=0.2)
+networkSettings = tdqn.networkSettings_(inputLayerSize=121, hiddenLayerSize=512, outputLayerSize=2, dropout=0.2)
 
 tdqnSettings = tdqn.tdqnSettings_(gamma=0.4, 
                                   epsilonStart=1.0, 
@@ -27,7 +28,7 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   targetUpdateFrequency=500, 
                                   batchSize=32, 
                                   gradientClipping=1,
-                                  targetNetworkUpdate = 100, 
+                                  targetNetworkUpdate = 1000, 
                                   alpha=0.1, 
                                   numberOfEpisodes = 50,
                                   rewardClipping = 1
@@ -54,8 +55,8 @@ def InitializeTrainingTesting(stockName, identifierString, verbose = False):
     if verbose == True:
         print("Stock Name: " + stockName + identifierString)
     
-    StockTraining = to.StockHandler(stockName, yf.download, yf.download, trainingHorizon)
-    StockTesting = to.StockHandler(stockName, yf.download, yf.download, testingHorizon)
+    StockTraining = to.StockHandler(stockName, ReadFromFile, ReadFromFile, trainingHorizon)
+    StockTesting = to.StockHandler(stockName, ReadFromFile, ReadFromFile, testingHorizon)
     PositionTraining = to.DummyPosition(StockTraining)
     PositionTesting = to.DummyPosition(StockTesting)
     TrainingEnvironment = te.TradingEnvironment(PositionTraining)

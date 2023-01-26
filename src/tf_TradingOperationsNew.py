@@ -270,6 +270,7 @@ class DummyPosition():
 
 
     def PlotActionsCapital(self, saveFileName, showFlag = False):
+        self.ToDataFrame()
         buyHistory, sellHistory = self.ParseActions()
         idx = np.argwhere(~np.isnan(buyHistory))
         idx = idx.flatten()
@@ -285,8 +286,8 @@ class DummyPosition():
 
         fig, ax1 = plt.subplots()
         ax1.plot(self.dataFrame.index, self.dataFrame["Value"], "r", label="Capital")
-        ax1.scatter(self.dataFrame.index[idx], buys, s=200, marker="^", label="Long")
-        ax1.scatter(self.dataFrame.index[idxSell], sells, s=200, marker="v", label="Short")
+        ax1.scatter(self.dataFrame.index[idx], buys, s=100, marker="^", label="Long")
+        ax1.scatter(self.dataFrame.index[idxSell], sells, s=100, marker="v", label="Short")
         ax1.set_xlabel("Date", fontsize=20)
         ax1.set_ylabel("Capital", fontsize=20)
         ax1.legend(loc="upper left", fontsize=14)
@@ -296,13 +297,14 @@ class DummyPosition():
         figure.set_size_inches(16,9)
         plt.tight_layout()
 
-        # plt.savefig(saveFileName + ".png", format = "png", dpi=300)
+        plt.savefig(saveFileName + ".png", format = "png", dpi=300)
         if showFlag == True:
             plt.show()
 
 
 
     def PlotActionsCandle(self, saveFileName, showFlag = False):
+        self.ToDataFrame()
         buyHistory, sellHistory = self.ParseActions()
         idx = np.argwhere(~np.isnan(buyHistory))
         idx = idx.flatten()
@@ -319,6 +321,7 @@ class DummyPosition():
 
 
     def PlotActionsPrice(self, saveFileName, showFlag = False):
+        self.ToDataFrame()
         buyHistory, sellHistory = self.ParseActions()
         idx = np.argwhere(~np.isnan(buyHistory))
         idx = idx.flatten()
@@ -330,8 +333,8 @@ class DummyPosition():
 
         fig, ax1 = plt.subplots()
         ax1.plot(self.dataFrame.index, self.dataFrame["Close"], "r", label="Price")
-        ax1.scatter(self.dataFrame.index[idx], buys, s=200, marker="^", label="Long")
-        ax1.scatter(self.dataFrame.index[idxSell], sells, s=200, marker="v", label="Short")
+        ax1.scatter(self.dataFrame.index[idx], buys, s=100, marker="^", label="Long")
+        ax1.scatter(self.dataFrame.index[idxSell], sells, s=100, marker="v", label="Short")
         ax1.set_xlabel("Date", fontsize=20)
         ax1.set_ylabel("Price", fontsize=20)
         ax1.legend(loc="upper left", fontsize=14)

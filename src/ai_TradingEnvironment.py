@@ -3,6 +3,7 @@ import numpy as np
 from collections import namedtuple
 from sklearn.preprocessing import MinMaxScaler
 from scipy.ndimage import gaussian_filter
+import random
 
 
 Horizon = namedtuple("Horizon", ["start", "end", "interval"])
@@ -26,9 +27,9 @@ class StateObject():
                                                        self.Position.low[currentRange],
                                                        self.Position.close[currentRange],
                                                        self.Position.volume[currentRange])))
-        return np.concatenate((partialState.flatten("F"), [position]))
+        # return np.concatenate((partialState.flatten("F"), [position]))
+        return np.concatenate((partialState.flatten("F"), [position])).tolist()
         
-
 
 class TradingEnvironment(gym.Env):    
     def __init__(self, Position,  stateLength = 30):
@@ -99,3 +100,7 @@ class TradingEnvironment(gym.Env):
     def SetStartingPoint(self, startingPoint):
         self.t = np.clip(startingPoint, self.stateLength, self.Position.Length)
         self.Position.SetStartingPoint(self.t)
+
+
+    def SetRandomStartingPoint(self):
+        self.SetStartingPoint(random.randrange(self.Position.Length))
