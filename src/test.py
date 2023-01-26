@@ -51,6 +51,10 @@ trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
 stock = to.StockHandler("AAPL", ReadFromFile, ReadFromFile, trainingHorizon)
 pos = to.DummyPosition(stock)
 env = te.TradingEnvironment(pos)
-for i in range(100):
-    env.step(1)
-print(env.state)
+while env.done == 0:
+    env.step(0)
+    # env.step(random.randint(0,1))
+
+env.Position.ToDataFrame()
+# print(env.Position.dataFrame)
+env.Position.PlotActionsCapital("test", showFlag=True)

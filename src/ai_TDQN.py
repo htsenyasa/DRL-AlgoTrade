@@ -255,8 +255,6 @@ class TDQNAgent():
     def Training(self, verbose = False):
 
         env = self.TrainingEnvironment
-        DataAugmentation = da.DataAugmentation()
-        env = DataAugmentation.generate(env)[0]
         self.currentLoss = torch.tensor(np.nan, device=self.device)
 
         for episode in range(self.tdqnSettings.numberOfEpisodes):
@@ -266,17 +264,16 @@ class TDQNAgent():
                 print("{} Training: Episode {}".format(stockCodePadded, episode))
 
             env.reset()
-            env.SetCustomStartingPoint(random.randrange(env.dataFrameLength))
-            state = self.StateProcessing(env.state)
+            env.SetStartingPoint(random.randrange(env.dataFrameLength))
+            state = env.state
             previousAction = 0
             done = 0
 
             while done == 0:
-                action = self.ChooseAction(state, previousAction)[0]
+                action, _, _ = self.ChooseAction(state, previousAction)
 
                 nextState, reward, done = env.step(action)
 
-                nextState = self.StateProcessing(nextState)
                 reward = self.RewardProcessing(reward)
                 self.ReplayMemory.Push(state, action, reward, nextState, done)
 
@@ -285,7 +282,6 @@ class TDQNAgent():
                 state = nextState
                 previousAction = action
             
-
             self.loss.append(self.currentLoss.cpu().detach().numpy())
         
         return self.TrainingEnvironment
@@ -294,19 +290,17 @@ class TDQNAgent():
 
     def Testing(self):
         
-        DataAugmentation = da.DataAugmentation()
-        self.TestingEnvironment.reset()
-        env = DataAugmentation.lowPassFilter(self.TestingEnvironment, 5)
-
-        state = self.StateProcessing(env.state)
+        env = self.TestingEnvironment
+        env.reset()
+        
+        state = env.state
         previousAction = None
         done = 0
 
         while done == 0:
             action, _, _ = self.ChooseAction(state, previousAction, trainingFlag=False)
             nextState, _, done = env.step(action)
-            self.TestingEnvironment.step(action)
-            state = self.StateProcessing(nextState)
+            state = nextState
 
         return self.TestingEnvironment
 

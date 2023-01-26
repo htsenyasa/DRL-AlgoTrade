@@ -136,7 +136,7 @@ class DummyPosition():
             self.__PreIteration()
             f(*args)
             self.__PostIteration()
-            self.t += 1
+            self.t += 1 # Need to implement exception throw
         return Iteration
 
 
@@ -250,8 +250,8 @@ class DummyPosition():
         actions = self.position
         index = []
 
-        buyHistory = np.full(self.dataFrameLength, np.nan)
-        sellHistory = np.full(self.dataFrameLength, np.nan)
+        buyHistory = np.full(self.Length, np.nan)
+        sellHistory = np.full(self.Length, np.nan)
 
         for i in range(len(actions)-1):
             if actions[i] == actions[i+1]:
@@ -296,7 +296,7 @@ class DummyPosition():
         figure.set_size_inches(16,9)
         plt.tight_layout()
 
-        plt.savefig(saveFileName + ".png", format = "png", dpi=300)
+        # plt.savefig(saveFileName + ".png", format = "png", dpi=300)
         if showFlag == True:
             plt.show()
 

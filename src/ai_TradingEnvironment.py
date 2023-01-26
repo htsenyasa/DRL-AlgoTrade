@@ -81,11 +81,16 @@ class TradingEnvironment(gym.Env):
         self.state = self.UpdateState()
         self.t += 1
 
-        if self.t == self.Position.Length:
-            self.done = 1
+        self.done = self.CheckDoneSignal()
         
         return self.state, self.reward, self.done   
 
+
+    def CheckDoneSignal(self):
+        # if self.t == self.Position.Length or self.Position.value[self.t-1] < self.Position.initialCash * 0.6:
+        if self.t == self.Position.Length:
+            return 1
+        return 0
 
     def GetReward(self):
         return self.Position.returns[self.t]
