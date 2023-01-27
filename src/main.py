@@ -9,12 +9,10 @@ import torch
 import numpy as np
 import random
 import os
-from cm_common import ReadFromFile
+from cm_common import ReadFromFile, Grouper
 
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
-torch.manual_seed(0)
-random.seed(0)
-np.random.seed(0)
+
 
 
 networkSettings = tdqn.networkSettings_(inputLayerSize=121, hiddenLayerSize=512, outputLayerSize=2, dropout=0.2)
@@ -47,6 +45,9 @@ testingHorizon = te.Horizon(splittingDate, endingDate, "1d")
 
 
 def InitializeTrainingTesting(stockName, identifierString, verbose = False):
+    torch.manual_seed(0)
+    random.seed(0)
+    np.random.seed(0)
     fileName = stockName + identifierString
     modelFileName = "./Models/" + fileName + "/" + stockName
     figureFileName = "./Figures/" + fileName + "/" + stockName
@@ -96,7 +97,40 @@ def InitializeTesting(stockName, identifierString, verbose = False):
 if __name__ == "__main__":
     mp.set_start_method('spawn')
     # listOfStocksNames = ["DOHOL.IS"]
-    listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS"]
+    listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS", "ASELS.IS", "SISE.IS", "TSKB.IS"]
+
+    listOfStocksNames = ["AKBNK.IS",
+              "AKSEN.IS",
+              "ALARK.IS",
+              "ARCLK.IS",
+              "ASELS.IS",
+              "BIMAS.IS",
+              "EKGYO.IS",
+              "EREGL.IS",
+              "FROTO.IS",
+              "GUBRF.IS",
+              "SAHOL.IS",
+              "HEKTS.IS",
+              "KRDMD.IS",
+              "KCHOL.IS",
+              "KOZAL.IS",
+              "KOZAA.IS",
+              "ODAS.IS",
+              "PGSUS.IS",
+              "PETKM.IS",
+              "SASA.IS",
+              "TAVHL.IS",
+              "TKFEN.IS",
+              "TOASO.IS",
+              "TCELL.IS",
+              "TUPRS.IS",
+              "THYAO.IS",
+              "GARAN.IS",
+              "ISCTR.IS",
+              "SISE.IS",
+              "YKBNK.IS"]
+
+
     identifier = "-2123-{}E-{}B-{}U".format(tdqnSettings.numberOfEpisodes, tdqnSettings.batchSize, tdqnSettings.targetNetworkUpdate)
 
     paths = ["Models", "Figures"]
@@ -109,10 +143,15 @@ if __name__ == "__main__":
 
     processList = [mp.Process(target=InitializeTrainingTesting, args = (listOfStocksNames[i], identifier, True)) for i in range(len(listOfStocksNames))]
     
-    for process in processList:
-        process.start()
+    processGroup = Grouper(processList, 3) 
 
-    for process in processList:
-        process.join()
+    for processList in processGroup:
+        for process in processList:
+            process.start()
+        for process in processList:
+            process.join()
+
+    # for process in processList:
+    #     process.join()
 
 
