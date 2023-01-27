@@ -33,8 +33,7 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   batchSize=64, 
                                   gradientClipping=1,
                                   targetNetworkUpdate = 1000, 
-                                  alpha=0.1, 
-                                  numberOfEpisodes = 100,
+                                  numberOfEpisodes = 50,
                                   rewardClipping = 1
                                   )
 
@@ -50,11 +49,26 @@ trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
 
 stock = to.StockHandler("AAPL", ReadFromFile, ReadFromFile, trainingHorizon)
 pos = to.DummyPosition(stock)
-env = te.TradingEnvironment(pos)
-while env.done == 0:
-    env.step(0)
-    # env.step(random.randint(0,1))
 
-env.Position.ToDataFrame()
-# print(env.Position.dataFrame)
-env.Position.PlotActionsCapital("test", showFlag=True)
+pos.GoLong()
+pos.GoLong()
+
+pos.NewActionBranch(depth=1)
+pos.GoShort()
+pos.ToDataFrame()
+print(pos.dataFrame[29:40])
+pos.MergeBranches()
+
+
+pos.GoLong()
+pos.GoLong()
+pos.ToDataFrame()
+print(pos.dataFrame[29:40])
+
+pos.ResetPosition()
+pos.GoLong()
+pos.GoLong()
+pos.GoLong()
+pos.GoLong()
+pos.ToDataFrame()
+print(pos.dataFrame[29:40])

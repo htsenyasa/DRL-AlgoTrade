@@ -13,27 +13,28 @@ class StateObject():
         self.Position = principalPosition # Must be a reference to the position class passed to the trading env.
         self.ancillaryStocks = ancillaryStocks
         self.__columns = ["High", "Low", "Close", "Volume"]
-        self.InitScaler()
-
-    def InitScaler(self):
         self.scaler = MinMaxScaler()
-        self.scaler.fit(self.Position.dataFrame[self.__columns].values)
+        self.scaler.fit(self.Position.dataFrame[self.__columns].values) # Default Scaling
+
+    def InitScaler(self, dataFrame):
+        self.scaler = MinMaxScaler()
+        self.scaler.fit(dataFrame[self.__columns].values)
 
     def ScaleState(self, partialState):
         return self.scaler.transform(partialState)
 
     def GetState(self, currentRange, position):
         partialState = self.ScaleState(np.column_stack((self.Position.high[currentRange],
-                                                       self.Position.low[currentRange],
-                                                       self.Position.close[currentRange],
-                                                       self.Position.volume[currentRange])))
+                                                        self.Position.low[currentRange],
+                                                        self.Position.close[currentRange],
+                                                        self.Position.volume[currentRange])))
         # return np.concatenate((partialState.flatten("F"), [position]))
         return np.concatenate((partialState.flatten("F"), [position])).tolist()
         
 
 class TradingEnvironment(gym.Env):    
     def __init__(self, Position,  stateLength = 30):
-        self.Position = Position 
+        self.Position = Position
 
         self.stateLength = int(stateLength)
         self.t = int(stateLength)
@@ -43,12 +44,16 @@ class TradingEnvironment(gym.Env):
         self.actions = {"LONG": 1, "SHORT": 0}
 
         self.__State = StateObject(Position, None)
-        self.state = self.UpdateState()
+        self.state = self.__UpdateState()
         self.reward = 0.
         self.done = 0
 
 
-    def UpdateState(self):
+    def InitScaler(self, dataFrame):
+        self.__State.InitScaler(dataFrame)
+
+
+    def __UpdateState(self):
         currentRange = slice(self.t - self.stateLength, self.t)
         if self.t == self.stateLength: # For __init__ (this may be redundant.)
             position = self.Position.NO_POSITION
@@ -65,7 +70,7 @@ class TradingEnvironment(gym.Env):
         self.done = 0
         self.t = self.stateLength
         
-        self.state = self.UpdateState()
+        self.state = self.__UpdateState()
 
         return self.state
 
@@ -79,7 +84,7 @@ class TradingEnvironment(gym.Env):
             
         self.reward = self.GetReward()
 
-        self.state = self.UpdateState()
+        self.state = self.__UpdateState()
         self.t += 1
 
         self.done = self.CheckDoneSignal()

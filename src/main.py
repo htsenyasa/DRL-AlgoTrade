@@ -28,8 +28,7 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   targetUpdateFrequency=500, 
                                   batchSize=32, 
                                   gradientClipping=1,
-                                  targetNetworkUpdate = 1000, 
-                                  alpha=0.1, 
+                                  targetNetworkUpdate = 500, 
                                   numberOfEpisodes = 50,
                                   rewardClipping = 1
                                   )
@@ -39,7 +38,7 @@ optimSettings = tdqn.optimSettings_(L2Factor=0.000001)
 
 startingDate = '2012-01-01'
 splittingDate = '2021-01-01'
-endingDate = '2023-01-01'
+endingDate = '2023-01-27'
 
 
 trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
@@ -61,13 +60,18 @@ def InitializeTrainingTesting(stockName, identifierString, verbose = False):
     PositionTesting = to.DummyPosition(StockTesting)
     TrainingEnvironment = te.TradingEnvironment(PositionTraining)
     TestingEnvironment = te.TradingEnvironment(PositionTesting)
+    TrainingEnvironment.InitScaler(TrainingEnvironment.Position.dataFrame)
+    TestingEnvironment.InitScaler(TrainingEnvironment.Position.dataFrame)
     Agent = tdqn.TDQNAgent(TrainingEnvironment, TestingEnvironment, tdqnSettings, networkSettings, optimSettings)
-    Agent.Training(verbose=True)
+    Agent.Training(verbose=False)
     Agent.SaveModel(modelFileName)
     Agent.Testing()
     PositionTesting.PlotActionsCapital(figureFileName + "-Capital", showFlag=False)
     PositionTesting.PlotActionsPrice(figureFileName + "-Price", showFlag=False)
     Agent.PlotLoss(figureFileName + "-Loss", showFlag=False)
+
+    if verbose == True:
+        print("Stock Name: " + stockName + identifierString + " Done")
 
 
 def InitializeTesting(stockName, identifierString, verbose = False):
@@ -91,7 +95,8 @@ def InitializeTesting(stockName, identifierString, verbose = False):
 
 if __name__ == "__main__":
     mp.set_start_method('spawn')
-    listOfStocksNames = ["AAPL", "ISCTR.IS"]
+    # listOfStocksNames = ["DOHOL.IS"]
+    listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS"]
     identifier = "-2123-{}E-{}B-{}U".format(tdqnSettings.numberOfEpisodes, tdqnSettings.batchSize, tdqnSettings.targetNetworkUpdate)
 
     paths = ["Models", "Figures"]

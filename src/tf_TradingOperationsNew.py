@@ -56,7 +56,7 @@ class StockHandler():
 
 class DummyPosition():
     """ Creates an empty dummy position for a given stock for simulation purposes"""
-    def __init__(self, stock, t = 30, initialCash = 100_000, tradingFee = 0.0, shortMargin = 0.8):
+    def __init__(self, stock, t = 30, initialCash = 100_000, tradingFee = 5/10_000, shortMargin = 0.8):
         self.stock = stock
         self.LONG = 1
         self.NO_POSITION = 0
@@ -212,7 +212,6 @@ class DummyPosition():
         self.__PostIteration()
 
 
-
     def ToDataFrame(self):
         self.dataFrame["Cash"] = self.cash
         self.dataFrame["Position"] = self.position
@@ -223,26 +222,30 @@ class DummyPosition():
         self.dataFrame["Returns"] = self.returns
 
 
-    def NewActionBranch(self):
-        t = self.t
-        self.__tempCash = self.cash[t-1:t+1]
-        self.__tempPosition = self.position[t-1:t+1]
-        self.__tempAction = self.action[t-1:t+1]
-        self.__tempLots = self.lots[t-1:t+1]
-        self.__tempHoldings = self.holdings[t-1:t+1]
-        self.__tempValue = self.value[t-1:t+1]
-        self.__tempReturns = self.returns[t-1:t+1]
+    def NewActionBranch(self, depth):
+        self.__tempT = self.t
+        self.__depth = depth
+        t = self.__tempT
+        self.__tempCash = self.cash[t-1:t+depth].copy()
+        self.__tempPosition = self.position[t-1:t+depth].copy()
+        self.__tempAction = self.action[t-1:t+depth].copy()
+        self.__tempLots = self.lots[t-1:t+depth].copy()
+        self.__tempHoldings = self.holdings[t-1:t+depth].copy()
+        self.__tempValue = self.value[t-1:t+depth].copy()
+        self.__tempReturns = self.returns[t-1:t+depth].copy()
 
 
     def MergeBranches(self):
-        t = self.t
-        self.cash[t-1:t+1] = self.__tempCash
-        self.position[t-1:t+1] = self.__tempPosition
-        self.action[t-1:t+1] = self.__tempAction
-        self.lots[t-1:t+1] = self.__tempLots
-        self.holdings[t-1:t+1] = self.__tempHoldings
-        self.value[t-1:t+1] = self.__tempValue
-        self.returns[t-1:t+1] = self.__tempReturns
+        t = self.__tempT
+        depth = self.__depth
+        self.cash[t-1:t+depth] = self.__tempCash.copy()
+        self.position[t-1:t+depth] = self.__tempPosition.copy()
+        self.action[t-1:t+depth] = self.__tempAction.copy()
+        self.lots[t-1:t+depth] = self.__tempLots.copy()
+        self.holdings[t-1:t+depth] = self.__tempHoldings.copy()
+        self.value[t-1:t+depth] = self.__tempValue.copy()
+        self.returns[t-1:t+depth] = self.__tempReturns.copy()
+        self.t = self.__tempT
 
 
 
@@ -286,8 +289,8 @@ class DummyPosition():
 
         fig, ax1 = plt.subplots()
         ax1.plot(self.dataFrame.index, self.dataFrame["Value"], "r", label="Capital")
-        ax1.scatter(self.dataFrame.index[idx], buys, s=100, marker="^", label="Long")
-        ax1.scatter(self.dataFrame.index[idxSell], sells, s=100, marker="v", label="Short")
+        ax1.scatter(self.dataFrame.index[idx], buys, s=50, marker="^", label="Long")
+        ax1.scatter(self.dataFrame.index[idxSell], sells, s=50, marker="v", label="Short")
         ax1.set_xlabel("Date", fontsize=20)
         ax1.set_ylabel("Capital", fontsize=20)
         ax1.legend(loc="upper left", fontsize=14)
@@ -333,8 +336,8 @@ class DummyPosition():
 
         fig, ax1 = plt.subplots()
         ax1.plot(self.dataFrame.index, self.dataFrame["Close"], "r", label="Price")
-        ax1.scatter(self.dataFrame.index[idx], buys, s=100, marker="^", label="Long")
-        ax1.scatter(self.dataFrame.index[idxSell], sells, s=100, marker="v", label="Short")
+        ax1.scatter(self.dataFrame.index[idx], buys, s=50, marker="^", label="Long")
+        ax1.scatter(self.dataFrame.index[idxSell], sells, s=50, marker="v", label="Short")
         ax1.set_xlabel("Date", fontsize=20)
         ax1.set_ylabel("Price", fontsize=20)
         ax1.legend(loc="upper left", fontsize=14)

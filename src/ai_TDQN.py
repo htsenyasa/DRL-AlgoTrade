@@ -8,15 +8,13 @@ import torch.nn.functional as F
 import ai_Network as network
 import math
 import numpy as np
-import tf_DataAugmentation as da
 import matplotlib.pyplot as plt
 import pickle
-from sklearn.preprocessing import MinMaxScaler
 
 tdqnSettings_ = namedtuple("tdqnSettings", ["gamma", "epsilonStart", "epsilonEnd", "epsilonDecay", 
                                             "capacity", "learningRate", "targetUpdateFrequency",
                                             "batchSize", "gradientClipping", "targetNetworkUpdate",
-                                            "alpha", "numberOfEpisodes", "rewardClipping"])
+                                            "numberOfEpisodes", "rewardClipping"])
 
 networkSettings_ = namedtuple("networkSettings", ["inputLayerSize", "hiddenLayerSize", "outputLayerSize",
                                                   "dropout"])
@@ -191,17 +189,15 @@ class TDQNAgent():
             done = 0
 
             while done == 0:
+                
                 action, _, _ = self.ChooseAction(state, previousAction)
-
                 nextState, reward, done = env.step(action)
-
                 reward = self.RewardProcessing(reward)
                 self.ReplayMemory.Push(state, action, reward, nextState, done)
-
-                self.LearnFromMemory()
-
                 state = nextState
                 previousAction = action
+
+                self.LearnFromMemory()
             
             self.loss.append(self.currentLoss.cpu().detach().numpy())
         
