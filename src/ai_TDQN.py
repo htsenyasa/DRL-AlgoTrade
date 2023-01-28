@@ -21,13 +21,6 @@ networkSettings_ = namedtuple("networkSettings", ["inputLayerSize", "hiddenLayer
 
 optimSettings_ = namedtuple("optimSettings", ["L2Factor"])
 
-class MemoryElement():
-    def __init__(self, device, *args):
-        self.state = torch.tensor(args[0], dtype=torch.float, device=device)
-        self.action = torch.tensor(args[1], dtype=torch.long, device=device)
-        self.reward = torch.tensor(args[2], dtype=torch.float, device=device)
-        self.nextState = torch.tensor(args[3], dtype=torch.float, device=device)
-        self.done = torch.tensor(args[4], dtype=torch.float, device=device)
 
 
 class ReplayMemory():
