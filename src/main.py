@@ -9,7 +9,7 @@ import torch
 import numpy as np
 import random
 import os
-from cm_common import ReadFromFile, Grouper
+from cm_common import ReadFromFile, Grouper, DummyProcess
 
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
 
@@ -26,8 +26,8 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   targetUpdateFrequency=500, 
                                   batchSize=32, 
                                   gradientClipping=1,
-                                  targetNetworkUpdate = 500, 
-                                  numberOfEpisodes = 50,
+                                  targetNetworkUpdate = 1000, 
+                                  numberOfEpisodes = 100,
                                   rewardClipping = 1
                                   )
 
@@ -35,8 +35,8 @@ optimSettings = tdqn.optimSettings_(L2Factor=0.000001)
 
 
 startingDate = '2012-01-01'
-splittingDate = '2021-01-01'
-endingDate = '2023-01-27'
+splittingDate = '2020-01-01'
+endingDate = '2022-01-27'
 
 
 trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
@@ -96,39 +96,40 @@ def InitializeTesting(stockName, identifierString, verbose = False):
 
 if __name__ == "__main__":
     mp.set_start_method('spawn')
-    # listOfStocksNames = ["DOHOL.IS"]
-    listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS", "ASELS.IS", "SISE.IS", "TSKB.IS"]
+    listOfStocksNames = ["AKSEN.IS"]
+    # listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS", "ASELS.IS", "SISE.IS", "TSKB.IS"]
+    # listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS"]
 
-    listOfStocksNames = ["AKBNK.IS",
-              "AKSEN.IS",
-              "ALARK.IS",
-              "ARCLK.IS",
-              "ASELS.IS",
-              "BIMAS.IS",
-              "EKGYO.IS",
-              "EREGL.IS",
-              "FROTO.IS",
-              "GUBRF.IS",
-              "SAHOL.IS",
-              "HEKTS.IS",
-              "KRDMD.IS",
-              "KCHOL.IS",
-              "KOZAL.IS",
-              "KOZAA.IS",
-              "ODAS.IS",
-              "PGSUS.IS",
-              "PETKM.IS",
-              "SASA.IS",
-              "TAVHL.IS",
-              "TKFEN.IS",
-              "TOASO.IS",
-              "TCELL.IS",
-              "TUPRS.IS",
-              "THYAO.IS",
-              "GARAN.IS",
-              "ISCTR.IS",
-              "SISE.IS",
-              "YKBNK.IS"]
+    # listOfStocksNames = ["AKBNK.IS",
+    #           "AKSEN.IS",
+    #           "ALARK.IS",
+    #           "ARCLK.IS",
+    #           "ASELS.IS",
+    #           "BIMAS.IS",
+    #           "EKGYO.IS",
+    #           "EREGL.IS",
+    #           "FROTO.IS",
+    #           "GUBRF.IS",
+    #           "SAHOL.IS",
+    #           "HEKTS.IS",
+    #           "KRDMD.IS",
+    #           "KCHOL.IS",
+    #           "KOZAL.IS",
+    #           "KOZAA.IS",
+    #           "ODAS.IS",
+    #           "PGSUS.IS",
+    #           "PETKM.IS",
+    #           "SASA.IS",
+    #           "TAVHL.IS",
+    #           "TKFEN.IS",
+    #           "TOASO.IS",
+    #           "TCELL.IS",
+    #           "TUPRS.IS",
+    #           "THYAO.IS",
+    #           "GARAN.IS",
+    #           "ISCTR.IS",
+    #           "SISE.IS",
+    #           "YKBNK.IS"]
 
 
     identifier = "-2123-{}E-{}B-{}U".format(tdqnSettings.numberOfEpisodes, tdqnSettings.batchSize, tdqnSettings.targetNetworkUpdate)
@@ -143,7 +144,8 @@ if __name__ == "__main__":
 
     processList = [mp.Process(target=InitializeTrainingTesting, args = (listOfStocksNames[i], identifier, True)) for i in range(len(listOfStocksNames))]
     
-    processGroup = Grouper(processList, 3) 
+    proc = DummyProcess()
+    processGroup = Grouper(processList, 3, proc) 
 
     for processList in processGroup:
         for process in processList:

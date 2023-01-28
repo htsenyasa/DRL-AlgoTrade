@@ -11,3 +11,10 @@ def ReadFromFile(stockName, start, end, interval, progress):
 def Grouper(iterable, n, fillValue=None): #https://stackoverflow.com/a/434411
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillValue)
+
+
+class DummyProcess():
+    def start(self):
+        print("Dummy Process starts (Not a real process)")
+    def join(self):
+        print("Dummy Process joins (Not a real process)")

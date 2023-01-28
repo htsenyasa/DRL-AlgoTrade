@@ -119,9 +119,10 @@ class TDQNAgent():
                 if random.random() > self.tdqnSettings.alpha:
                     return self.ChooseAction(state, previousAction, trainingFlag=False)
                 else:
-                    return previousAction, 0, [0, 0]
+                    return previousAction, 0, [0 for _ in range(size)]
             else:
-                return random.randrange(self.networkSettings.outputLayerSize), 0, [0, 0]
+                size = self.networkSettings.outputLayerSize
+                return random.randrange(size), 0, [0 for _ in range(size)]
 
 
         with torch.no_grad():
