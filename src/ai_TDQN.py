@@ -35,7 +35,7 @@ class ReplayMemory():
 
     def SampleTail(self, batchSize):
         tail = len(self.memory) - 1
-        return zip(*[self.memory[i] for i in range(tail, tail-batchSize, -1)])
+        return zip(*[self.memory[i] for i in range(tail-batchSize, tail, 1)])
 
     def __len__(self):
         return len(self.memory)
@@ -163,6 +163,14 @@ class TDQNAgent():
             done = 0
 
             while done == 0:
+
+                env.NewActionBranch()
+                action, _, _ = self.ChooseAction(state, previousAction)
+                nextState, reward, done = env.step(int(not bool(action))) # Opposite action
+                reward = self.RewardProcessing(reward)
+                self.ReplayMemory.Push(state, action, reward, nextState, done)
+                env.MergeBranches()
+
                 
                 action, _, _ = self.ChooseAction(state, previousAction)
                 nextState, reward, done = env.step(action)

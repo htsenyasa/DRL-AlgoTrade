@@ -74,6 +74,7 @@ class TradingEnvironment(gym.Env):
         return self.state
 
 
+
     def step(self, action):
 
         if action == self.actions["LONG"]:
@@ -91,14 +92,18 @@ class TradingEnvironment(gym.Env):
         return self.state, self.reward, self.done   
 
 
+
     def CheckDoneSignal(self):
         # if self.t == self.Position.Length or self.Position.value[self.t-1] < self.Position.initialCash * 0.6:
         if self.t == self.Position.Length:
             return 1
         return 0
 
+
+
     def GetReward(self):
         return self.Position.returns[self.t]
+
 
 
     def SetStartingPoint(self, startingPoint):
@@ -106,8 +111,25 @@ class TradingEnvironment(gym.Env):
         self.Position.SetStartingPoint(self.t)
 
 
+
     def SetRandomStartingPoint(self, randRange = None):
         if randRange == None:
             self.SetStartingPoint(random.randrange(1, self.Position.Length))
         else:
             self.SetStartingPoint(random.randrange(*randRange))
+
+
+
+    def NewActionBranch(self, depth=1):
+        self.__tempT = self.t
+        self.__tempState = self.state
+        self.__tempDone = self.done
+        self.Position.NewActionBranch(depth)
+
+
+    
+    def MergeBranches(self):
+        self.t = self.__tempT
+        self.state = self.__tempState
+        self.done = self.__tempDone
+        self.Position.MergeBranches()

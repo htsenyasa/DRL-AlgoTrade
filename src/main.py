@@ -27,8 +27,8 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   batchSize=32, 
                                   gradientClipping=1,
                                   targetNetworkUpdate = 1000, 
-                                  numberOfEpisodes = 40,
-                                  onlineNumberOfEpisodes = 3,
+                                  numberOfEpisodes = 30,
+                                  onlineNumberOfEpisodes = 2,
                                   rewardClipping = 1
                                   )
 
@@ -97,7 +97,7 @@ def InitializeTesting(stockName, identifierString, verbose = False):
 
 if __name__ == "__main__":
     mp.set_start_method('spawn')
-    # listOfStocksNames = ["AKSEN.IS"]
+    # listOfStocksNames = ["TSKB.IS"]
     # listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS", "ASELS.IS", "SISE.IS", "TSKB.IS"]
     listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS"]
 
