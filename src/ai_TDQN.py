@@ -14,7 +14,7 @@ import pickle
 tdqnSettings_ = namedtuple("tdqnSettings", ["gamma", "epsilonStart", "epsilonEnd", "epsilonDecay", 
                                             "capacity", "learningRate", "targetUpdateFrequency",
                                             "batchSize", "gradientClipping", "targetNetworkUpdate",
-                                            "numberOfEpisodes", "rewardClipping"])
+                                            "numberOfEpisodes", "onlineNumberOfEpisodes", "rewardClipping"])
 
 networkSettings_ = namedtuple("networkSettings", ["inputLayerSize", "hiddenLayerSize", "outputLayerSize",
                                                   "dropout"])
@@ -33,6 +33,10 @@ class ReplayMemory():
     def Sample(self, batchSize):
         return zip(*random.sample(self.memory, batchSize))
 
+    def SampleTail(self, batchSize):
+        tail = len(self.memory) - 1
+        return zip(*[self.memory[i] for i in range(tail, tail-batchSize, -1)])
+
     def __len__(self):
         return len(self.memory)
 
@@ -50,6 +54,7 @@ class TDQNAgent():
         self.optimSettings = optimSettings
         self.device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
         self.iteration = 0
+        self.learningIteration = 0
         self.loss = []
 
         self.ReplayMemory = ReplayMemory(self.tdqnSettings.capacity)
@@ -87,7 +92,7 @@ class TDQNAgent():
 
             if sample > self.GetEpsilon(iteration):
                return self.ChooseAction(state, previousAction, trainingFlag=False)
-            return random.randrange(self.networkSettings.outputLayerSize), 0, [0, 0]
+            return random.randrange(self.networkSettings.outputLayerSize), 0, [0 for _ in range(self.networkSettings.outputLayerSize)]
 
         with torch.no_grad():
             state = torch.tensor(state, dtype=torch.float, device=self.device).unsqueeze(0)
@@ -100,43 +105,17 @@ class TDQNAgent():
 
 
 
-    def ChooseAction2(self, state, previousAction, trainingFlag = True):
-        
-        if trainingFlag == True:
-            # sample = random.random()
-            # alphaRandom = random.random()
-            iteration = self.iteration
-            self.iteration += 1
-
-            if random.random() > self.GetEpsilon(iteration):
-                if random.random() > self.tdqnSettings.alpha:
-                    return self.ChooseAction(state, previousAction, trainingFlag=False)
-                else:
-                    return previousAction, 0, [0 for _ in range(size)]
-            else:
-                size = self.networkSettings.outputLayerSize
-                return random.randrange(size), 0, [0 for _ in range(size)]
-
-
-        with torch.no_grad():
-            state = torch.tensor(state, dtype=torch.float, device=self.device).unsqueeze(0)
-            output = self.PolicyNetwork(state).squeeze(0)
-            QMax, index = output.max(0)
-            action = index.item()
-            Q = QMax.item()
-            QValues = output.cpu().numpy()
-            return action, Q, QValues
-
-
-
-    def LearnFromMemory(self):
+    def LearnFromMemory(self, online=False):
         
         if len(self.ReplayMemory) < self.tdqnSettings.batchSize:
             return
 
         self.PolicyNetwork.train()
 
-        state, action, reward, nextState, done = self.ReplayMemory.Sample(self.tdqnSettings.batchSize)
+        if online == False:
+            state, action, reward, nextState, done = self.ReplayMemory.Sample(self.tdqnSettings.batchSize)
+        else:
+            state, action, reward, nextState, done = self.ReplayMemory.SampleTail(self.tdqnSettings.batchSize)
 
         state = torch.tensor(state, dtype=torch.float, device=self.device)
         action = torch.tensor(action, dtype=torch.long, device=self.device)
@@ -158,9 +137,10 @@ class TDQNAgent():
         torch.nn.utils.clip_grad_norm_(self.PolicyNetwork.parameters(), self.tdqnSettings.gradientClipping)
         self.optimizer.step()
         
-        if(self.iteration % self.tdqnSettings.targetNetworkUpdate == 0):
+        if self.learningIteration % self.tdqnSettings.targetNetworkUpdate == 0:
             self.TargetNetwork.load_state_dict(self.PolicyNetwork.state_dict())
         
+        self.learningIteration += 1
         self.PolicyNetwork.eval()
 
 
@@ -173,7 +153,7 @@ class TDQNAgent():
         for episode in range(self.tdqnSettings.numberOfEpisodes):
 
             if verbose == True:
-                stockCodePadded = self.TrainingEnvironment.Position.stock.stockCode.ljust(8)
+                stockCodePadded = env.Position.stock.stockCode.ljust(8)
                 print("{} Training: Episode {}".format(stockCodePadded, episode))
 
             env.reset()
@@ -195,23 +175,26 @@ class TDQNAgent():
             
             self.loss.append(self.currentLoss.cpu().detach().numpy())
         
-        return self.TrainingEnvironment
-
+        return env
 
 
     def Testing(self):
         
         env = self.TestingEnvironment
         env.reset()
-        
         state = env.state
-        previousAction = None
+        previousAction = 0
         done = 0
 
         while done == 0:
             action, _, _ = self.ChooseAction(state, previousAction, trainingFlag=False)
-            nextState, _, done = env.step(action)
+            nextState, reward, done = env.step(action)
+            reward = self.RewardProcessing(reward)
+            self.ReplayMemory.Push(state, action, reward, nextState, done)
             state = nextState
+            previousAction = action
+            for _ in range(self.tdqnSettings.onlineNumberOfEpisodes):
+                self.LearnFromMemory(online=True)
 
         return self.TestingEnvironment
 

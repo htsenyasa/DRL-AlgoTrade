@@ -15,7 +15,7 @@ device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
 
 
 
-networkSettings = tdqn.networkSettings_(inputLayerSize=121, hiddenLayerSize=512, outputLayerSize=2, dropout=0.2)
+networkSettings = tdqn.networkSettings_(inputLayerSize=121, hiddenLayerSize=1024, outputLayerSize=2, dropout=0.2)
 
 tdqnSettings = tdqn.tdqnSettings_(gamma=0.4, 
                                   epsilonStart=1.0, 
@@ -26,8 +26,9 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   targetUpdateFrequency=500, 
                                   batchSize=32, 
                                   gradientClipping=1,
-                                  targetNetworkUpdate = 500, 
-                                  numberOfEpisodes = 50,
+                                  targetNetworkUpdate = 1000, 
+                                  numberOfEpisodes = 40,
+                                  onlineNumberOfEpisodes = 3,
                                   rewardClipping = 1
                                   )
 
@@ -83,7 +84,7 @@ def InitializeTesting(stockName, identifierString, verbose = False):
     if verbose == True:
         print("Stock Name: " + stockName)
     
-    StockTesting = to.StockHandler(stockName, yf.download, yf.download, testingHorizon)
+    StockTesting = to.StockHandler(stockName, ReadFromFile, ReadFromFile, testingHorizon)
     PositionTesting = to.DummyPosition(StockTesting)
     TestingEnvironment = te.TradingEnvironment(PositionTesting)
     Agent = tdqn.TDQNAgent(TestingEnvironment, TestingEnvironment, tdqnSettings, networkSettings, optimSettings)
@@ -97,39 +98,39 @@ def InitializeTesting(stockName, identifierString, verbose = False):
 if __name__ == "__main__":
     mp.set_start_method('spawn')
     # listOfStocksNames = ["AKSEN.IS"]
-    # # listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS", "ASELS.IS", "SISE.IS", "TSKB.IS"]
-    # # listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS"]
+    # listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS", "ASELS.IS", "SISE.IS", "TSKB.IS"]
+    listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS"]
 
-    listOfStocksNames = ["AKBNK.IS",
-              "AKSEN.IS",
-              "ALARK.IS",
-              "ARCLK.IS",
-              "ASELS.IS",
-              "BIMAS.IS",
-              "EKGYO.IS",
-              "EREGL.IS",
-              "FROTO.IS",
-              "GUBRF.IS",
-              "SAHOL.IS",
-              "HEKTS.IS",
-              "KRDMD.IS",
-              "KCHOL.IS",
-              "KOZAL.IS",
-              "KOZAA.IS",
-              "ODAS.IS",
-              "PGSUS.IS",
-              "PETKM.IS",
-              "SASA.IS",
-              "TAVHL.IS",
-              "TKFEN.IS",
-              "TOASO.IS",
-              "TCELL.IS",
-              "TUPRS.IS",
-              "THYAO.IS",
-              "GARAN.IS",
-              "ISCTR.IS",
-              "SISE.IS",
-              "YKBNK.IS"]
+    # listOfStocksNames = ["AKBNK.IS",
+    #           "AKSEN.IS",
+    #           "ALARK.IS",
+    #           "ARCLK.IS",
+    #           "ASELS.IS",
+    #           "BIMAS.IS",
+    #           "EKGYO.IS",
+    #           "EREGL.IS",
+    #           "FROTO.IS",
+    #           "GUBRF.IS",
+    #           "SAHOL.IS",
+    #           "HEKTS.IS",
+    #           "KRDMD.IS",
+    #           "KCHOL.IS",
+    #           "KOZAL.IS",
+    #           "KOZAA.IS",
+    #           "ODAS.IS",
+    #           "PGSUS.IS",
+    #           "PETKM.IS",
+    #           "SASA.IS",
+    #           "TAVHL.IS",
+    #           "TKFEN.IS",
+    #           "TOASO.IS",
+    #           "TCELL.IS",
+    #           "TUPRS.IS",
+    #           "THYAO.IS",
+    #           "GARAN.IS",
+    #           "ISCTR.IS",
+    #           "SISE.IS",
+    #           "YKBNK.IS"]
     listOfStocksNames.sort()
 
 

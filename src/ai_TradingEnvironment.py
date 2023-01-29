@@ -37,8 +37,7 @@ class TradingEnvironment(gym.Env):
         self.Position = Position
 
         self.stateLength = int(stateLength)
-        self.t = int(stateLength)
-        self.SetStartingPoint(self.t)
+        self.SetStartingPoint(self.stateLength)
 
         self.horizon = Position.stock.horizon
         self.actions = {"LONG": 1, "SHORT": 0}
@@ -107,5 +106,8 @@ class TradingEnvironment(gym.Env):
         self.Position.SetStartingPoint(self.t)
 
 
-    def SetRandomStartingPoint(self):
-        self.SetStartingPoint(random.randrange(self.Position.Length))
+    def SetRandomStartingPoint(self, randRange = None):
+        if randRange == None:
+            self.SetStartingPoint(random.randrange(1, self.Position.Length))
+        else:
+            self.SetStartingPoint(random.randrange(*randRange))
