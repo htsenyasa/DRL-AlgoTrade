@@ -25,18 +25,27 @@ class StockHandler():
         self.horizon = horizon
 
         self.dataFrame = GetFunc(self.stockCode, start=horizon.start, end=horizon.end, interval=horizon.interval, progress=False)
-        
-        if interpolate is True:
-            self.dataFrame.replace(0.0, np.nan, inplace=True)
-            self.dataFrame.interpolate(method='linear', limit=5, limit_area='inside', inplace=True)
-            self.dataFrame.fillna(method='ffill', inplace=True)
-            self.dataFrame.fillna(method='bfill', inplace=True)
-            self.dataFrame.fillna(0, inplace=True)
-        
+              
         self.dataFrame["Close"] = self.dataFrame["Adj Close"]
         self.dataFrame = self.dataFrame.drop(columns=["Adj Close"])
 
+        self.__FillData()
+
         self.SetPrecision(2)
+
+    def __FillData(self):
+        self.dataFrame = self.dataFrame.set_index(self.dataFrame.index).resample("D").asfreq()
+        self.dataFrame = self.dataFrame[self.dataFrame.index.dayofweek < 5]
+        self.__Interpolate()
+
+
+    def __Interpolate(self):
+        self.dataFrame.replace(0.0, np.nan, inplace=True)
+        self.dataFrame.interpolate(method='linear', limit=5, limit_area='inside', inplace=True)
+        self.dataFrame.fillna(method='ffill', inplace=True)
+        self.dataFrame.fillna(method='bfill', inplace=True)
+        self.dataFrame.fillna(0, inplace=True)
+        
 
     def Update(self):
         newData = self.UpdateFunc(self.stockCode)

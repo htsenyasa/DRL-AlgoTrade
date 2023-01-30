@@ -10,12 +10,9 @@ import numpy as np
 import random
 import os
 from cm_common import ReadFromFile, Grouper, DummyProcess
-
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
 
-
-
-networkSettings = tdqn.networkSettings_(inputLayerSize=121, hiddenLayerSize=1024, outputLayerSize=2, dropout=0.2)
+networkSettings = tdqn.networkSettings_(inputLayerSize=181, hiddenLayerSize=1024, outputLayerSize=2, dropout=0.4)
 
 tdqnSettings = tdqn.tdqnSettings_(gamma=0.4, 
                                   epsilonStart=1.0, 
@@ -27,9 +24,9 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   batchSize=32, 
                                   gradientClipping=1,
                                   targetNetworkUpdate = 1000, 
-                                  numberOfEpisodes = 30,
-                                  onlineNumberOfEpisodes = 2,
-                                  rewardClipping = 1
+                                  numberOfEpisodes = 40,
+                                  onlineNumberOfEpisodes = 3,
+                                  rewardClipping = 1.2
                                   )
 
 optimSettings = tdqn.optimSettings_(L2Factor=0.000001)
@@ -42,7 +39,6 @@ endingDate = '2023-01-27'
 
 trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
 testingHorizon = te.Horizon(splittingDate, endingDate, "1d")
-
 
 
 def InitializeTrainingTesting(stockName, identifierString, verbose = False):
@@ -58,14 +54,19 @@ def InitializeTrainingTesting(stockName, identifierString, verbose = False):
     
     StockTraining = to.StockHandler(stockName, ReadFromFile, ReadFromFile, trainingHorizon)
     StockTesting = to.StockHandler(stockName, ReadFromFile, ReadFromFile, testingHorizon)
+    bistIndexTraining = to.StockHandler("XU100.IS", ReadFromFile, ReadFromFile, trainingHorizon)
+    bistIndexTesting = to.StockHandler("XU100.IS", ReadFromFile, ReadFromFile, testingHorizon)
+
     PositionTraining = to.DummyPosition(StockTraining)
     PositionTesting = to.DummyPosition(StockTesting)
-    TrainingEnvironment = te.TradingEnvironment(PositionTraining)
-    TestingEnvironment = te.TradingEnvironment(PositionTesting)
+    
+    TrainingEnvironment = te.TradingEnvironment(PositionTraining, bistIndexTraining)
+    TestingEnvironment = te.TradingEnvironment(PositionTesting, bistIndexTesting)
     TrainingEnvironment.InitScaler(TrainingEnvironment.Position.dataFrame)
     TestingEnvironment.InitScaler(TrainingEnvironment.Position.dataFrame)
+    
     Agent = tdqn.TDQNAgent(TrainingEnvironment, TestingEnvironment, tdqnSettings, networkSettings, optimSettings)
-    Agent.Training(verbose=False)
+    Agent.Training(verbose=True)
     Agent.SaveModel(modelFileName)
     Agent.Testing()
     PositionTesting.PlotActionsCapital(figureFileName + "-Capital", showFlag=False)
@@ -97,9 +98,9 @@ def InitializeTesting(stockName, identifierString, verbose = False):
 
 if __name__ == "__main__":
     mp.set_start_method('spawn')
-    # listOfStocksNames = ["TSKB.IS"]
+    listOfStocksNames = ["TSKB.IS"]
     # listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS", "ASELS.IS", "SISE.IS", "TSKB.IS"]
-    listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS"]
+    # listOfStocksNames = ["TSKB.IS", "ISCTR.IS", "DOHOL.IS"]
 
     # listOfStocksNames = ["AKBNK.IS",
     #           "AKSEN.IS",

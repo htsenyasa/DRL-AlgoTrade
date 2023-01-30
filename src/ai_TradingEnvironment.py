@@ -12,9 +12,10 @@ class StateObject():
     def __init__(self, principalPosition, ancillaryStocks):
         self.Position = principalPosition # Must be a reference to the position class passed to the trading env.
         self.ancillaryStocks = ancillaryStocks
-        self.__columns = ["High", "Low", "Close", "Volume"]
+        self.__columns = ["Open", "High", "Low", "Close", "Volume"]
         self.scaler = MinMaxScaler()
         self.scaler.fit(self.Position.dataFrame[self.__columns].values) # Default Scaling
+        self.__InitIndexScaler()
 
     def InitScaler(self, dataFrame):
         self.scaler = MinMaxScaler()
@@ -23,17 +24,23 @@ class StateObject():
     def ScaleState(self, partialState):
         return self.scaler.transform(partialState)
 
+    def __InitIndexScaler(self):
+        scaler = MinMaxScaler()
+        self.bistClose = scaler.fit_transform(self.ancillaryStocks.dataFrame["Close"].values.reshape(-1,1)).flatten()
+
     def GetState(self, currentRange, position):
-        partialState = self.ScaleState(np.column_stack((self.Position.high[currentRange],
+        partialState = self.ScaleState(np.column_stack((self.Position.open[currentRange],
+                                                        self.Position.high[currentRange],
                                                         self.Position.low[currentRange],
                                                         self.Position.close[currentRange],
                                                         self.Position.volume[currentRange])))
+        partialState = np.column_stack((partialState, self.bistClose[currentRange]))
         # return np.concatenate((partialState.flatten("F"), [position]))
         return np.concatenate((partialState.flatten("F"), [position])).tolist()
         
 
 class TradingEnvironment(gym.Env):    
-    def __init__(self, Position,  stateLength = 30):
+    def __init__(self, Position, ancillaryStocks = None, stateLength = 30):
         self.Position = Position
 
         self.stateLength = int(stateLength)
@@ -42,7 +49,7 @@ class TradingEnvironment(gym.Env):
         self.horizon = Position.stock.horizon
         self.actions = {"LONG": 1, "SHORT": 0}
 
-        self.__State = StateObject(Position, None)
+        self.__State = StateObject(Position, ancillaryStocks)
         self.state = self.__UpdateState()
         self.reward = 0.
         self.done = 0

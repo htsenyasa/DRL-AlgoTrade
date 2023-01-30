@@ -33,9 +33,14 @@ class ReplayMemory():
     def Sample(self, batchSize):
         return zip(*random.sample(self.memory, batchSize))
 
+    # def SampleTail(self, batchSize):
+    #     tail = len(self.memory) - 1
+    #     return zip(*[self.memory[i] for i in range(tail-batchSize, tail, 1)])
+
     def SampleTail(self, batchSize):
-        tail = len(self.memory) - 1
-        return zip(*[self.memory[i] for i in range(tail-batchSize, tail, 1)])
+        tailIndex = len(self.memory) - 1
+        sampleTail = [self.memory[i] for i in range(tailIndex-batchSize * 4, tailIndex, 1)]
+        return zip(*random.sample(sampleTail, batchSize))
 
     def __len__(self):
         return len(self.memory)
@@ -90,7 +95,7 @@ class TDQNAgent():
             iteration = self.iteration
             self.iteration += 1
 
-            if sample > self.GetEpsilon(iteration):
+            if sample < self.GetEpsilon(iteration):
                return self.ChooseAction(state, previousAction, trainingFlag=False)
             return random.randrange(self.networkSettings.outputLayerSize), 0, [0 for _ in range(self.networkSettings.outputLayerSize)]
 
@@ -186,7 +191,7 @@ class TDQNAgent():
         return env
 
 
-    def Testing(self):
+    def Testing(self, online=True):
         
         env = self.TestingEnvironment
         env.reset()
@@ -195,14 +200,25 @@ class TDQNAgent():
         done = 0
 
         while done == 0:
+            if online == True:
+                env.NewActionBranch()
+                action, _, _ = self.ChooseAction(state, previousAction)
+                nextState, reward, done = env.step(int(not bool(action))) # Opposite action
+                reward = self.RewardProcessing(reward)
+                self.ReplayMemory.Push(state, action, reward, nextState, done)
+                env.MergeBranches()
+
+
             action, _, _ = self.ChooseAction(state, previousAction, trainingFlag=False)
             nextState, reward, done = env.step(action)
             reward = self.RewardProcessing(reward)
             self.ReplayMemory.Push(state, action, reward, nextState, done)
             state = nextState
             previousAction = action
-            for _ in range(self.tdqnSettings.onlineNumberOfEpisodes):
-                self.LearnFromMemory(online=True)
+
+            if online == True:
+                for _ in range(self.tdqnSettings.onlineNumberOfEpisodes):
+                    self.LearnFromMemory(online=True)
 
         return self.TestingEnvironment
 
