@@ -12,7 +12,7 @@ import os
 from cm_common import ReadFromFile, Grouper, DummyProcess
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
 
-networkSettings = tdqn.networkSettings_(inputLayerSize=181, hiddenLayerSize=1024, outputLayerSize=2, dropout=0.4)
+networkSettings = tdqn.networkSettings_(inputLayerSize=181, hiddenLayerSize=1024, outputLayerSize=2, dropout=0.1)
 
 tdqnSettings = tdqn.tdqnSettings_(gamma=0.4, 
                                   epsilonStart=1.0, 
@@ -98,8 +98,8 @@ def InitializeTesting(stockName, identifierString, verbose = False):
 
 if __name__ == "__main__":
     mp.set_start_method('spawn')
-    listOfStocksNames = ["TSKB.IS"]
-    # listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS", "ASELS.IS", "SISE.IS", "TSKB.IS"]
+    # listOfStocksNames = ["TSKB.IS"]
+    listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS", "ASELS.IS", "SISE.IS", "TSKB.IS"]
     # listOfStocksNames = ["TSKB.IS", "ISCTR.IS", "DOHOL.IS"]
 
     # listOfStocksNames = ["AKBNK.IS",
