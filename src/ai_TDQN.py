@@ -33,14 +33,10 @@ class ReplayMemory():
     def Sample(self, batchSize):
         return zip(*random.sample(self.memory, batchSize))
 
-    # def SampleTail(self, batchSize):
-    #     tail = len(self.memory) - 1
-    #     return zip(*[self.memory[i] for i in range(tail-batchSize, tail, 1)])
-
     def SampleTail(self, batchSize):
         tailIndex = len(self.memory) - 1
-        sampleTail = [self.memory[i] for i in range(tailIndex-batchSize * 4, tailIndex, 1)]
-        return zip(*random.sample(sampleTail, batchSize))
+        tailSample = [self.memory[i] for i in range(tailIndex-batchSize * 2, tailIndex, 1)]
+        return zip(*random.sample(tailSample, batchSize))
 
     def __len__(self):
         return len(self.memory)
@@ -189,6 +185,7 @@ class TDQNAgent():
             self.loss.append(self.currentLoss.cpu().detach().numpy())
         
         return env
+
 
 
     def Testing(self, online=True):

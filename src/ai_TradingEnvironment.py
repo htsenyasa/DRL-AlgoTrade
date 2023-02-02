@@ -15,7 +15,7 @@ class StateObject():
         self.__columns = ["Open", "High", "Low", "Close", "Volume"]
         self.scaler = MinMaxScaler()
         self.scaler.fit(self.Position.dataFrame[self.__columns].values) # Default Scaling
-        self.__InitIndexScaler()
+        # self.__InitIndexScaler()
 
     def InitScaler(self, dataFrame):
         self.scaler = MinMaxScaler()
@@ -34,7 +34,7 @@ class StateObject():
                                                         self.Position.low[currentRange],
                                                         self.Position.close[currentRange],
                                                         self.Position.volume[currentRange])))
-        partialState = np.column_stack((partialState, self.bistClose[currentRange]))
+        # partialState = np.column_stack((partialState, self.bistClose[currentRange]))
         # return np.concatenate((partialState.flatten("F"), [position]))
         return np.concatenate((partialState.flatten("F"), [position])).tolist()
         

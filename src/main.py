@@ -12,7 +12,7 @@ import os
 from cm_common import ReadFromFile, Grouper, DummyProcess
 device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
 
-networkSettings = tdqn.networkSettings_(inputLayerSize=181, hiddenLayerSize=1024, outputLayerSize=2, dropout=0.1)
+networkSettings = tdqn.networkSettings_(inputLayerSize=151, hiddenLayerSize=1024, outputLayerSize=2, dropout=0.4)
 
 tdqnSettings = tdqn.tdqnSettings_(gamma=0.4, 
                                   epsilonStart=1.0, 
@@ -24,17 +24,17 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   batchSize=32, 
                                   gradientClipping=1,
                                   targetNetworkUpdate = 1000, 
-                                  numberOfEpisodes = 40,
+                                  numberOfEpisodes = 30,
                                   onlineNumberOfEpisodes = 3,
-                                  rewardClipping = 1.2
+                                  rewardClipping = 1.5
                                   )
 
 optimSettings = tdqn.optimSettings_(L2Factor=0.000001)
 
 
-startingDate = '2012-01-01'
+startingDate = '2015-01-01'
 splittingDate = '2022-01-01'
-endingDate = '2023-01-27'
+endingDate = '2023-02-01'
 
 
 trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
@@ -99,8 +99,9 @@ def InitializeTesting(stockName, identifierString, verbose = False):
 if __name__ == "__main__":
     mp.set_start_method('spawn')
     # listOfStocksNames = ["TSKB.IS"]
-    listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS", "ASELS.IS", "SISE.IS", "TSKB.IS"]
-    # listOfStocksNames = ["TSKB.IS", "ISCTR.IS", "DOHOL.IS"]
+    # listOfStocksNames = ["BTC-USD"]
+    # listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS", "ASELS.IS", "SISE.IS", "TSKB.IS"]
+    listOfStocksNames = ["TSKB.IS", "ISCTR.IS", "DOHOL.IS"]
 
     # listOfStocksNames = ["AKBNK.IS",
     #           "AKSEN.IS",

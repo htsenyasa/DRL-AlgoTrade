@@ -327,7 +327,7 @@ class DummyPosition():
         sells = self.dataFrame["Close"][idxSell]
 
         apd = [mpf.make_addplot(buyHistory,type='scatter', markersize=50,marker='^'), mpf.make_addplot(sellHistory,type='scatter', markersize=50,marker='v')]
-        saveFileName = saveFileName + "-candle" + ".png"
+        saveFileName = saveFileName + ".png"
         mpf.plot(self.dataFrame, addplot=apd, type="candle", savefig=saveFileName)
 
 
@@ -356,7 +356,7 @@ class DummyPosition():
         figure.set_size_inches(16,9)
         plt.tight_layout()
 
-        saveFileName = saveFileName + "-price" + ".png"
+        saveFileName = saveFileName + ".png"
         plt.savefig(saveFileName, format = "png", dpi=300)
         if showFlag == True:
             plt.show()
