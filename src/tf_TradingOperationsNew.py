@@ -103,6 +103,7 @@ class DummyPosition():
 
 
     def SetStartingPoint(self, t):
+        # implement t = 0 exception
         self.__t = t
         self.t = t
 

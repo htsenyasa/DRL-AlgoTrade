@@ -10,7 +10,8 @@ import numpy as np
 import random
 import os
 from cm_common import ReadFromFile, Grouper, DummyProcess
-device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
+# device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
+device = torch.device("cpu")
 
 networkSettings = tdqn.networkSettings_(inputLayerSize=151, hiddenLayerSize=1024, outputLayerSize=2, dropout=0.4)
 
@@ -24,9 +25,10 @@ tdqnSettings = tdqn.tdqnSettings_(gamma=0.4,
                                   batchSize=32, 
                                   gradientClipping=1,
                                   targetNetworkUpdate = 1000, 
-                                  numberOfEpisodes = 30,
+                                  numberOfEpisodes = 10,
                                   onlineNumberOfEpisodes = 3,
-                                  rewardClipping = 1.5
+                                  rewardClipping = 1.5,
+                                  device = device
                                   )
 
 optimSettings = tdqn.optimSettings_(L2Factor=0.000001)
@@ -34,7 +36,7 @@ optimSettings = tdqn.optimSettings_(L2Factor=0.000001)
 
 startingDate = '2015-01-01'
 splittingDate = '2022-01-01'
-endingDate = '2023-02-01'
+endingDate = '2023-02-24'
 
 
 trainingHorizon = te.Horizon(startingDate, splittingDate, "1d")
@@ -103,36 +105,36 @@ if __name__ == "__main__":
     # listOfStocksNames = ["AAPL", "ISCTR.IS", "DOHOL.IS", "ASELS.IS", "SISE.IS", "TSKB.IS"]
     listOfStocksNames = ["TSKB.IS", "ISCTR.IS", "DOHOL.IS"]
 
-    # listOfStocksNames = ["AKBNK.IS",
-    #           "AKSEN.IS",
-    #           "ALARK.IS",
-    #           "ARCLK.IS",
-    #           "ASELS.IS",
-    #           "BIMAS.IS",
-    #           "EKGYO.IS",
-    #           "EREGL.IS",
-    #           "FROTO.IS",
-    #           "GUBRF.IS",
-    #           "SAHOL.IS",
-    #           "HEKTS.IS",
-    #           "KRDMD.IS",
-    #           "KCHOL.IS",
-    #           "KOZAL.IS",
-    #           "KOZAA.IS",
-    #           "ODAS.IS",
-    #           "PGSUS.IS",
-    #           "PETKM.IS",
-    #           "SASA.IS",
-    #           "TAVHL.IS",
-    #           "TKFEN.IS",
-    #           "TOASO.IS",
-    #           "TCELL.IS",
-    #           "TUPRS.IS",
-    #           "THYAO.IS",
-    #           "GARAN.IS",
-    #           "ISCTR.IS",
-    #           "SISE.IS",
-    #           "YKBNK.IS"]
+    listOfStocksNames = ["AKBNK.IS",
+              "AKSEN.IS",
+              "ALARK.IS",
+              "ARCLK.IS",
+              "ASELS.IS",
+              "BIMAS.IS",
+              "EKGYO.IS",
+              "EREGL.IS",
+              "FROTO.IS",
+              "GUBRF.IS",
+              "SAHOL.IS",
+              "HEKTS.IS",
+              "KRDMD.IS",
+              "KCHOL.IS",
+              "KOZAL.IS",
+              "KOZAA.IS",
+              "ODAS.IS",
+              "PGSUS.IS",
+              "PETKM.IS",
+              "SASA.IS",
+              "TAVHL.IS",
+              "TKFEN.IS",
+              "TOASO.IS",
+              "TCELL.IS",
+              "TUPRS.IS",
+              "THYAO.IS",
+              "GARAN.IS",
+              "ISCTR.IS",
+              "SISE.IS",
+              "YKBNK.IS"]
     listOfStocksNames.sort()
 
 
@@ -149,7 +151,7 @@ if __name__ == "__main__":
     processList = [mp.Process(target=InitializeTrainingTesting, args = (listOfStocksNames[i], identifier, True)) for i in range(len(listOfStocksNames))]
     
     proc = DummyProcess()
-    processGroup = Grouper(processList, 3, proc) 
+    processGroup = Grouper(processList, 12, proc) 
 
     for processList in processGroup:
         for process in processList:

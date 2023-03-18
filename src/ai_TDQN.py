@@ -14,7 +14,7 @@ import pickle
 tdqnSettings_ = namedtuple("tdqnSettings", ["gamma", "epsilonStart", "epsilonEnd", "epsilonDecay", 
                                             "capacity", "learningRate", "targetUpdateFrequency",
                                             "batchSize", "gradientClipping", "targetNetworkUpdate",
-                                            "numberOfEpisodes", "onlineNumberOfEpisodes", "rewardClipping"])
+                                            "numberOfEpisodes", "onlineNumberOfEpisodes", "rewardClipping", "device"])
 
 networkSettings_ = namedtuple("networkSettings", ["inputLayerSize", "hiddenLayerSize", "outputLayerSize",
                                                   "dropout"])
@@ -35,7 +35,7 @@ class ReplayMemory():
 
     def SampleTail(self, batchSize):
         tailIndex = len(self.memory) - 1
-        tailSample = [self.memory[i] for i in range(tailIndex-batchSize * 2, tailIndex, 1)]
+        tailSample = [self.memory[i] for i in range(tailIndex - batchSize*2, tailIndex, 1)]
         return zip(*random.sample(tailSample, batchSize))
 
     def __len__(self):
@@ -53,7 +53,7 @@ class TDQNAgent():
         self.tdqnSettings = tdqnSettings
         self.networkSettings = networkSettings
         self.optimSettings = optimSettings
-        self.device = torch.device('cuda:'+str(0) if torch.cuda.is_available() else 'cpu')
+        self.device = tdqnSettings.device
         self.iteration = 0
         self.learningIteration = 0
         self.loss = []
