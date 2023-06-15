@@ -3,11 +3,11 @@ to algorithmic tranining" (Theate & Ernst, 2021).
 
 In addition to the original project, this project includes
 
-- Multiprocess support.
-- Online Training.
+- Multiprocess support
+- Online Training
 - Action Branching
 - Increased abstraction 
 - More compact and structured layers
-- Recent event bias. (Ongoing) 
+- Recent event bias (Ongoing) 
 
 and several other features. 
