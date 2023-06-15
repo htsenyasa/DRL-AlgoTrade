@@ -5,6 +5,9 @@ In addition to the original project, this project includes
 
 - Multiprocess support.
 - Online Training.
+- Action Branching
+- Increased abstraction 
+- More compacted and structured layers
 - Recent event bias. (Ongoing) 
 
 and several other features. 
