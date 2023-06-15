@@ -7,7 +7,7 @@ In addition to the original project, this project includes
 - Online Training.
 - Action Branching
 - Increased abstraction 
-- More compacted and structured layers
+- More compact and structured layers
 - Recent event bias. (Ongoing) 
 
 and several other features. 
